@@ -1,0 +1,9 @@
+<webscript>
+    <shortname>socialLogin</shortname>
+    <description>socialLogin</description>
+    <url>/socialLogin</url>
+    <authentication>none</authentication>
+    <format default="json"/>
+    <transaction allow="readwrite">required</transaction>
+    <!--<lifecycle>sample</lifecycle>    -->
+</webscript>

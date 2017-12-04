@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns="http://www.springframework.org/schema/beans"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <!-- Configure new authentication service -->
+
+    <!--<bean id="localAuthenticationService"-->
+    <!--class="com.flexsolution.authentication.oauth2.authentication.SwitchUserAuthenticationServiceImpl">-->
+    <!--<property name="authenticationComponent" ref="authenticationComponent"/>-->
+    <!--<property name="authorityService" ref="AuthorityService"/>-->
+    <!--</bean>-->
+
+    <!--Configure authentication component-->
+    <!--<bean id="authenticationComponent" class="org.alfresco.repo.security.authentication.AuthenticationComponentImpl"-->
+    <!--parent="authenticationComponentBase">-->
+    <!--<property name="authenticationDao" ref="authenticationDao"/>-->
+    <!--<property name="authenticationManager" ref="authenticationManager"/>-->
+    <!--<property name="allowGuestLogin" value="true"/>-->
+    <!--<property name="nodeService" ref="nodeService"/>-->
+    <!--<property name="personService" ref="personService"/>-->
+    <!--<property name="transactionService" ref="transactionService"/>-->
+    <!--&lt;!&ndash;                                                                  &ndash;&gt;-->
+    <!--&lt;!&ndash; A list of default users with admin rights.                       &ndash;&gt;-->
+    <!--&lt;!&ndash;                                                                  &ndash;&gt;-->
+    <!--&lt;!&ndash; If the security framework is case sensitive these values should  &ndash;&gt;-->
+    <!--&lt;!&ndash; be case sensitive user names. If the security framework is not   &ndash;&gt;-->
+    <!--&lt;!&ndash; case sensitive these values should be the lower-case user names. &ndash;&gt;-->
+    <!--&lt;!&ndash;                                                                  &ndash;&gt;-->
+    <!--&lt;!&ndash; By default this includes:                                        &ndash;&gt;-->
+    <!--&lt;!&ndash;    admin (the user name of default alfresco admin user)          &ndash;&gt;-->
+    <!--&lt;!&ndash;    administrator (the windows default admin user)                &ndash;&gt;-->
+    <!--&lt;!&ndash;                                                                  &ndash;&gt;-->
+    <!--&lt;!&ndash; This assumes that user names are not case sensitive.             &ndash;&gt;-->
+    <!--&lt;!&ndash;                                                                  &ndash;&gt;-->
+    <!--<property name="defaultAdministratorUserNames">-->
+    <!--<set>-->
+    <!--<value>${alfresco_user_store.adminusername}</value>-->
+    <!--<value>administrator</value>-->
+    <!--</set>-->
+    <!--</property>-->
+    <!--&lt;!&ndash;                                                                  &ndash;&gt;-->
+    <!--&lt;!&ndash; A list of default users acting as guests.                        &ndash;&gt;-->
+    <!--&lt;!&ndash;                                                                  &ndash;&gt;-->
+    <!--&lt;!&ndash; By default this includes:                                        &ndash;&gt;-->
+    <!--&lt;!&ndash;    guest (the user name of default alfresco guest user)          &ndash;&gt;-->
+    <!--&lt;!&ndash;                                                                  &ndash;&gt;-->
+    <!--&lt;!&ndash; This assumes that user names are not case sensitive.             &ndash;&gt;-->
+    <!--&lt;!&ndash;                                                                  &ndash;&gt;-->
+    <!--<property name="defaultGuestUserNames">-->
+    <!--<set>-->
+    <!--<value>${alfresco_user_store.guestusername}</value>-->
+    <!--</set>-->
+    <!--</property>-->
+    <!--</bean>-->
+
+
+    <!--<bean id="authenticationDao" class="org.alfresco.repo.security.authentication.RepositoryAuthenticationDao">-->
+    <!--<property name="nodeService" ref="nodeService"/>-->
+    <!--<property name="authorityService" ref="authorityService"/>-->
+    <!--<property name="tenantService" ref="tenantService"/>-->
+    <!--<property name="namespaceService" ref="namespaceService"/>-->
+    <!--<property name="compositePasswordEncoder" ref="compositePasswordEncoder"/>-->
+    <!--<property name="policyComponent" ref="policyComponent"/>-->
+    <!--<property name="authenticationCache" ref="authenticationCache"/>-->
+    <!--<property name="singletonCache" ref="immutableSingletonCache"/>-->
+    <!--<property name="transactionService" ref="transactionService"/>-->
+    <!--</bean>-->
+
+    <!-- ====================================================== -->
+    <!-- ====================================================== -->
+    <!-- ====================================================== -->
+
+    <bean id="authenticationComponent"
+          class="com.flexsolution.authentication.oauth2.authentication.SimpleAcceptOrRejectAllAuthenticationComponentImpl"
+          parent="authenticationComponentBase">
+        <property name="authenticationDao" ref="authenticationDao"/>
+        <property name="nodeService" ref="nodeService"/>
+        <property name="personService" ref="personService"/>
+        <property name="transactionService" ref="transactionService"/>
+        <property name="defaultAdministratorUserNameList"
+                  value="${external.authentication.defaultAdministratorUserNames}"/>
+    </bean>
+
+    <!-- Wrapped version to be used within subsystem -->
+    <bean id="AuthenticationComponent" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+        <property name="proxyInterfaces">
+            <list>
+                <value>org.alfresco.repo.security.authentication.AuthenticationComponent</value>
+            </list>
+        </property>
+        <property name="transactionManager" ref="transactionManager"/>
+        <property name="target" ref="authenticationComponent"/>
+        <property name="transactionAttributes">
+            <props>
+                <prop key="*">${server.transaction.mode.default}</prop>
+            </props>
+        </property>
+    </bean>
+
+    <!-- Authentication service for chaining -->
+    <bean id="localAuthenticationService" class="org.alfresco.repo.security.authentication.AuthenticationServiceImpl">
+        <property name="ticketComponent" ref="ticketComponent"/>
+        <property name="authenticationComponent" ref="authenticationComponent"/>
+        <property name="sysAdminParams" ref="sysAdminParams"/>
+        <property name="protectedUsersCache" ref="protectedUsersCache"/>
+        <property name="protectionEnabled" value="${authentication.protection.enabled}"/>
+        <property name="protectionLimit" value="${authentication.protection.limit}"/>
+        <property name="protectionPeriodSeconds" value="${authentication.protection.periodSeconds}"/>
+        <property name="personService" ref="PersonService"/>
+    </bean>
+
+    <!--https://localhost/share/page-->
+
+    <bean id="authenticationDao" class="org.alfresco.repo.security.authentication.RepositoryAuthenticationDao">
+        <property name="nodeService" ref="nodeService"/>
+        <property name="authorityService" ref="authorityService"/>
+        <property name="tenantService" ref="tenantService"/>
+        <property name="namespaceService" ref="namespaceService"/>
+        <property name="compositePasswordEncoder" ref="compositePasswordEncoder"/>
+        <property name="policyComponent" ref="policyComponent"/>
+        <property name="authenticationCache" ref="authenticationCache"/>
+        <property name="singletonCache" ref="immutableSingletonCache"/>
+        <property name="transactionService" ref="transactionService"/>
+    </bean>
+</beans>

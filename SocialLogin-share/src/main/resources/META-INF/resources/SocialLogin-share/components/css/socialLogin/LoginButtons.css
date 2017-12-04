@@ -1,0 +1,19 @@
+.form-fields.login .form-field.social-login-button > span.yui-button > .first-child > button {
+    background-color: #0077b5;
+    border-color: #0077b5;
+}
+
+.form-fields.login .form-field.social-login-button > span.yui-button > .first-child {
+    border-color: #0077b5;
+}
+
+.linked-in-color {
+    color: #0077b5;
+}
+
+.form-fields.login .form-field.social-login-button > span.yui-button > .first-child > button:before {
+    content: "\f08c";
+    font: normal normal normal 14px/1 FontAwesome;
+    font-size: 2em;
+    padding-right: 5px;
+}

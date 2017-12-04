@@ -1,6 +1,34 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns="http://www.springframework.org/schema/beans"
        xsi:schemaLocation="http://www.springframework.org/schema/beans
                 http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
+
+    <bean id="webscript.com.flexsolution.authentication.socialLogin.connector.social-secure.get"
+          class="com.flexsolution.authentication.oauth2.webscript.SocialSecure"
+          parent="webscript">
+        <property name="connectorService" ref="connector.service"/>
+        <property name="userFactory" ref="user.factory"/>
+        <property name="webFrameworkConfiguration" ref="webframework.config.element"/>
+    </bean>
+
+    <!-- Add module specific messages and labels -->
+    <bean id="com.flexsolution.resetPassword-share.resources"
+          class="org.springframework.extensions.surf.util.ResourceBundleBootstrapComponent">
+        <property name="resourceBundles">
+            <list>
+                <value>alfresco.web-extension.messages.social-login-share</value>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="oauth2AuthenticationFilter"
+          class="com.flexsolution.authentication.oauth2.filter.Oauth2AuthenticationFilter"
+          init-method="init">
+        <property name="endpoint" value="alfresco"/>
+        <property name="connectorService" ref="connector.service"/>
+        <property name="userFactory" ref="user.factory"/>
+        <property name="configService" ref="web.config"/>
+    </bean>
+
 </beans>
