@@ -34,7 +34,6 @@ import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.repo.security.authentication.AbstractAuthenticationComponent;
 import org.alfresco.repo.security.authentication.AuthenticationException;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
-import org.alfresco.repo.security.authentication.NTLMMode;
 import org.alfresco.repo.transaction.AlfrescoTransactionSupport;
 
 
@@ -52,9 +51,6 @@ import org.alfresco.repo.transaction.AlfrescoTransactionSupport;
  */
 public class SimpleAcceptOrRejectAllAuthenticationComponentImpl extends AbstractAuthenticationComponent
 {
-    private boolean accept = false;
-    private boolean supportNtlm = false;
-
     private AuthenticationDao authenticationDao;
 
     public SimpleAcceptOrRejectAllAuthenticationComponentImpl()
@@ -67,20 +63,9 @@ public class SimpleAcceptOrRejectAllAuthenticationComponentImpl extends Abstract
         this.authenticationDao = authenticationDao;
     }
 
-    public void setAccept(boolean accept)
-    {
-        this.accept = accept;
-    }
-            
-    public void setSupportNtlm(boolean supportNtlm)
-    {
-        this.supportNtlm = supportNtlm;
-    }
-
    public void authenticateImpl(String userName, char[] password) throws AuthenticationException
     {
-//        if(userName.equals(AlfrescoTransactionSupport.getResource("authenticationUserName")))//todo filter here, Now is always true!!!
-        if(true)
+        if(userName.equals(AlfrescoTransactionSupport.getResource("authenticationUserName")))//todo filter here, Now is always true!!!
         {
             setCurrentUser(userName);
         }
@@ -94,42 +79,19 @@ public class SimpleAcceptOrRejectAllAuthenticationComponentImpl extends Abstract
     @Override
     protected boolean implementationAllowsGuestLogin()
     {
-       return accept;
+       return false;
     }
 
-    public String getMD4HashedPassword(String userName)
-    {
-        if(accept)
-        {
-            return "0cb6948805f797bf2a82807973b89537";
-        }
-        else
-        {
-            throw new AuthenticationException("Access Denied");
-        }
-    }
-
-    public NTLMMode getNTLMMode()
-    {
-        return supportNtlm ? NTLMMode.MD4_PROVIDER : NTLMMode.NONE;
-    }
-    
-    /**
-     * The default is not to support Authentication token base authentication
-     */
-    public Authentication authenticate(Authentication token) throws AuthenticationException
-    {
-        throw new AlfrescoRuntimeException("Authentication via token not supported");
-    }
 
     /**
      * We actually have an acegi object so override the default method.
      */
-    @Override
-    protected UserDetails getUserDetails(String userName)//todo overwrite
+//    @Override
+    protected UserDetails getUserDetails1(String userName)//todo overwrite
     {
         UserDetails userDetails = null;
-        if (AuthenticationUtil.isMtEnabled())
+//        if (AuthenticationUtil.isMtEnabled())
+        if (true)
         {
             // ALF-9403 - "manual" runAs to avoid clearing ticket, eg. when called via "validate" (->setCurrentUser->CheckCurrentUser)
             Authentication originalFullAuthentication = AuthenticationUtil.getFullAuthentication();

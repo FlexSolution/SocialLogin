@@ -96,7 +96,7 @@ public class LinkedInTest extends DeclarativeWebScript {
 
 String userName = null;
         if (!testing) {
-            try (CloseableHttpClient httpclient = HttpClients.custom().build()){
+            try (CloseableHttpClient httpclient = HttpClients.custom().build()) {
                 HttpPost post = new HttpPost("https://www.linkedin.com/oauth/v2/accessToken");//todo config file
                 post.setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED_VALUE);
                 List<NameValuePair> params =  new ArrayList<>();
@@ -157,7 +157,7 @@ String userName = null;
         //todo load user data
         String userDataUrl = "https://api.linkedin.com/v1/people/~:(first-name,last-name,id,picture-url,email-address,location)?format=json";
 
-        try (CloseableHttpClient httpclient = HttpClients.custom().build()){
+        try (CloseableHttpClient httpclient = HttpClients.custom().build()) {
             HttpGet get = new HttpGet(userDataUrl);//todo config file
             get.setHeader("x-li-format", WebScriptResponse.JSON_FORMAT);
             get.setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);

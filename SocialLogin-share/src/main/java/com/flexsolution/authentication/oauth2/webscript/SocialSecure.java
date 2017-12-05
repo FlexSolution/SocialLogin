@@ -10,8 +10,10 @@ import org.springframework.extensions.config.WebFrameworkConfigElement;
 import org.springframework.extensions.surf.UserFactory;
 import org.springframework.extensions.surf.WebFrameworkConstants;
 import org.springframework.extensions.surf.exception.ConnectorServiceException;
+import org.springframework.extensions.surf.exception.CredentialVaultProviderException;
 import org.springframework.extensions.surf.exception.UserFactoryException;
 import org.springframework.extensions.surf.site.AuthenticationUtil;
+import org.springframework.extensions.surf.support.AlfrescoUserFactory;
 import org.springframework.extensions.surf.support.ThreadLocalRequestContext;
 import org.springframework.extensions.webscripts.AbstractWebScript;
 import org.springframework.extensions.webscripts.Status;
@@ -73,20 +75,16 @@ public class SocialSecure extends AbstractWebScript {
 
                 logger.debug("Getting new alfresco ticket for user: " + user);
 
-                boolean authenticated = userFactory.authenticate(httpServletRequest, user, "1");//any password
-                if (authenticated) {
-//                    AuthenticationUtil.login(req, res, (String) ololoKey, false, true);
-                    AuthenticationUtil.login(httpServletRequest, servletResponse, user, false,
-                            webFrameworkConfiguration.isLoginCookiesEnabled());
-                }
+                AuthenticationUtil.login(httpServletRequest, servletResponse, user, false,
+                        webFrameworkConfiguration.isLoginCookiesEnabled());
 
-//                AuthenticationUtil.login(httpServletRequest, servletResponse, user, false,
-//                        webFrameworkConfiguration.isLoginCookiesEnabled());
+                // Add activiti-admin and alfresco credentials to the vault as well.
+                CredentialVault vault = connectorService.getCredentialVault(session, user);
+                Credentials credentials = vault.newCredentials(SlingshotUserFactory.ACTIVITI_ADMIN_ENDPOINT_ID);
+                credentials.setProperty(Credentials.CREDENTIAL_USERNAME, user);
 
-                HttpSession httpServletRequestSession = httpServletRequest.getSession();
-
-//     httpServletRequestSession.setAttribute(UserFactory.SESSION_ATTRIBUTE_EXTERNAL_AUTH, Boolean.TRUE);//todo check logout + change password
-                httpServletRequestSession.setAttribute("OLOLO_KEY", user);
+                Credentials credentials2 = vault.newCredentials(AlfrescoUserFactory.ALFRESCO_ENDPOINT_ID);
+                credentials2.setProperty(Credentials.CREDENTIAL_USERNAME, user);
 
                 ConnectorSession connectorSession = connector.getConnectorSession();
                 connectorSession.setParameter(AlfrescoAuthenticator.CS_PARAM_ALF_TICKET, ticket);
@@ -116,6 +114,10 @@ public class SocialSecure extends AbstractWebScript {
         } catch (UserFactoryException e) {
             logger.error("Could not load user home page", e);
             servletResponse.sendError(Status.STATUS_INTERNAL_SERVER_ERROR, e.getMessage());
+        } catch (CredentialVaultProviderException e) {
+            logger.error("Could not load user Credential Vault", e);
+            servletResponse.sendError(Status.STATUS_INTERNAL_SERVER_ERROR, e.getMessage());
+            e.printStackTrace();
         }
     }
 

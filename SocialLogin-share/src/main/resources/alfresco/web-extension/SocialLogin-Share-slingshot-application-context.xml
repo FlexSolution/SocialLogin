@@ -22,13 +22,4 @@
         </property>
     </bean>
 
-    <bean id="oauth2AuthenticationFilter"
-          class="com.flexsolution.authentication.oauth2.filter.Oauth2AuthenticationFilter"
-          init-method="init">
-        <property name="endpoint" value="alfresco"/>
-        <property name="connectorService" ref="connector.service"/>
-        <property name="userFactory" ref="user.factory"/>
-        <property name="configService" ref="web.config"/>
-    </bean>
-
 </beans>
