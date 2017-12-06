@@ -27,6 +27,8 @@ import org.alfresco.service.cmr.security.AuthenticationService;
 import org.alfresco.service.cmr.security.PersonService;
 import org.alfresco.util.UrlUtil;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHeaders;
 import org.apache.http.NameValuePair;
@@ -39,14 +41,9 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 import org.springframework.extensions.webscripts.*;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.springframework.extensions.webscripts.servlet.WebScriptServletRuntime;
 import org.springframework.http.MediaType;
 import org.springframework.social.oauth2.OAuth2Version;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -60,8 +57,8 @@ import java.util.Map;
  * @author martin.bergljung@alfresco.com
  * @since 2.1.0
  */
-public class LinkedInTest extends DeclarativeWebScript {
-    private static Log logger = LogFactory.getLog(LinkedInTest.class);
+public class LinkedInSignInWebScript extends DeclarativeWebScript {
+    private static Log logger = LogFactory.getLog(LinkedInSignInWebScript.class);
 
     private SysAdminParams sysAdminParams;
     private AuthenticationService authenticationService;
@@ -72,10 +69,6 @@ public class LinkedInTest extends DeclarativeWebScript {
 
     protected Map<String, Object> executeImpl(WebScriptRequest req, Status status, Cache cache) {
 
-//        WebScriptSession session = req.getRuntime().getSession();
-
-        final HttpServletRequest httpServletRequest = WebScriptServletRuntime.getHttpServletRequest(req);
-        HttpSession session = httpServletRequest.getSession();
 
         String error = req.getParameter("error");
         if (StringUtils.isNotBlank(error)) {
@@ -94,12 +87,12 @@ public class LinkedInTest extends DeclarativeWebScript {
             throw new WebScriptException(Status.STATUS_UNAUTHORIZED, "CSRF attack detected");
         }
 
-String userName = null;
+        String userName = null;
         if (!testing) {
             try (CloseableHttpClient httpclient = HttpClients.custom().build()) {
                 HttpPost post = new HttpPost("https://www.linkedin.com/oauth/v2/accessToken");//todo config file
                 post.setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED_VALUE);
-                List<NameValuePair> params =  new ArrayList<>();
+                List<NameValuePair> params = new ArrayList<>();
                 params.add(new BasicNameValuePair("grant_type", "authorization_code"));
                 params.add(new BasicNameValuePair("code", code));
                 params.add(new BasicNameValuePair("redirect_uri", UrlUtil.getShareUrl(sysAdminParams) + "/service/api/social-login"));//todo config file
@@ -114,7 +107,7 @@ String userName = null;
 
                     HttpEntity entity = response.getEntity();
 
-                    if (statusCode ==  Status.STATUS_OK) {
+                    if (statusCode == Status.STATUS_OK) {
 
                         Gson gson = new Gson();
 
@@ -169,7 +162,7 @@ String userName = null;
 
                 HttpEntity entity = response.getEntity();
 
-                if (statusCode ==  Status.STATUS_OK) {
+                if (statusCode == Status.STATUS_OK) {
 
                     Gson gson = new Gson();
 
@@ -177,8 +170,8 @@ String userName = null;
 
                     System.out.println(responseString);
 
-                    Map<String,Object> map = new HashMap<>();
-                    map = (Map<String,Object>) gson.fromJson(responseString, map.getClass()); // todo convert
+                    Map<String, Object> map = new HashMap<>();
+                    map = (Map<String, Object>) gson.fromJson(responseString, map.getClass()); // todo convert
 
                     System.out.println(map);
 
@@ -189,7 +182,7 @@ String userName = null;
                     authenticationService.authenticate(username, "1".toCharArray());
 
                     NodeRef personOrNull = personService.getPersonOrNull(username);
-                    if (personOrNull != null){
+                    if (personOrNull != null) {
                         //todo move in the oauth subsystem
                         nodeService.setProperty(personOrNull, ContentModel.PROP_FIRSTNAME, (Serializable) map.get("firstName"));
                         nodeService.setProperty(personOrNull, ContentModel.PROP_LASTNAME, (Serializable) map.get("lastName"));

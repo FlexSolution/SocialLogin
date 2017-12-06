@@ -20,7 +20,7 @@
 	   xsi:schemaLocation="http://www.springframework.org/schema/beans
           http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
 	<bean id="webscript.com.flexsolution.authentication.oauth2.socialLogin.get"
-		  class="com.flexsolution.authentication.oauth2.webscript.LinkedInTest"
+		  class="com.flexsolution.authentication.oauth2.webscript.LinkedInSignInWebScript"
 		  parent="webscript">
 		<property name="sysAdminParams" ref="sysAdminParams"/>
 		<property name="authenticationService" ref="AuthenticationService"/>
