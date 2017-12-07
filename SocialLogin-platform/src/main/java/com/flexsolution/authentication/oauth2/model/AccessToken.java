@@ -1,18 +1,15 @@
-package com.flexsolution.authentication.oauth2.webscript;
+package com.flexsolution.authentication.oauth2.model;
 
 import lombok.Getter;
 import lombok.Setter;
-import lombok.ToString;
 
 
 @Setter
 @Getter
-@ToString //todo remove
-
-/**
- * https://developer.linkedin.com/docs/oauth2
- */
-public class AccessTokenResponse {
+        /*
+         * https://developer.linkedin.com/docs/oauth2
+         */
+public class AccessToken {
     /***
      * The access token for the user.  This value must be kept secure, as per your agreement to the
      */

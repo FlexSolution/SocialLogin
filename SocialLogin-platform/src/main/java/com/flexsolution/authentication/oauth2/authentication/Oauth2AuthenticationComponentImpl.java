@@ -25,7 +25,8 @@
  */
 package com.flexsolution.authentication.oauth2.authentication;
 
-import com.flexsolution.authentication.oauth2.webscript.LinkedInSignInWebScript;
+import com.flexsolution.authentication.oauth2.constant.Oauth2Transaction;
+import com.flexsolution.authentication.oauth2.webscript.SocialSignInWebScript;
 import org.alfresco.repo.security.authentication.AbstractAuthenticationComponent;
 import org.alfresco.repo.security.authentication.AuthenticationException;
 import org.alfresco.repo.transaction.AlfrescoTransactionSupport;
@@ -42,10 +43,10 @@ public class Oauth2AuthenticationComponentImpl extends AbstractAuthenticationCom
     }
 
     public void authenticateImpl(String userName, char[] password) throws AuthenticationException {
-        if (enabled && userName.equals(AlfrescoTransactionSupport.getResource("authenticationUserName")) &&
+        if (enabled && userName.equals(AlfrescoTransactionSupport.getResource(Oauth2Transaction.AUTHENTICATION_USER_NAME)) &&
                 // double check if it is called from our web script
                 Stream.of(Thread.currentThread().getStackTrace()).anyMatch(s ->
-                        LinkedInSignInWebScript.class.getName().equals(s.getClassName()))) {
+                        SocialSignInWebScript.class.getName().equals(s.getClassName()))) {
             setCurrentUser(userName);
         } else {
             throw new AuthenticationException("Access Denied");

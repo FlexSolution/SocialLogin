@@ -98,7 +98,7 @@ public class SocialSecure extends AbstractWebScript {
                 // receive description of the error
                 JSONObject jsonErrObject = new JSONObject(call.getText());
                 String errMessage = (String) ((JSONObject) jsonErrObject.get("status")).get("description");
-                logger.error("User switching is failed due to an error :\n" + call.getText());
+                logger.error("User token loading is failed due to an error :\n" + call.getText());
                 // set error status and message
                 servletResponse.sendError(Status.STATUS_BAD_REQUEST, errMessage);
             }

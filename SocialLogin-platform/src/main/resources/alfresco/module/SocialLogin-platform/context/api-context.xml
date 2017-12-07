@@ -8,11 +8,13 @@
 	<bean id="abstractOauth2Configs" class="com.flexsolution.authentication.oauth2.configs.AbstractOauth2Configs"
 		  abstract="true" init-method="init">
 		<property name="sysAdminParams" ref="sysAdminParams"/>
-		<property name="urlWebScript" ref="webscript.com.flexsolution.authentication.oauth2.authorizationUrl.get"/>
+        <property name="registerAPI" ref="oauth2APIFactoryBean"/>
 	</bean>
 
 	<bean id="linkedInOauth2Config" class="com.flexsolution.authentication.oauth2.configs.LinkedInOauth2Configs" parent="abstractOauth2Configs">
 		<property name="apiName" value="linkedIn"/>
 	</bean>
+
+	<bean id="oauth2APIFactoryBean" class="com.flexsolution.authentication.oauth2.configs.Oauth2APIFactoryImpl"/>
 
 </beans>
