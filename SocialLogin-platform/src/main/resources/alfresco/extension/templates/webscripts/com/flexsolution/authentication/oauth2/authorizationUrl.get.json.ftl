@@ -1,0 +1,1 @@
+{"authorizationUrl":"${authorizationUrl}"}

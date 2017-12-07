@@ -65,7 +65,6 @@ public class SocialSecure extends AbstractWebScript {
             final Response call = connector.call("/socialLogin?code=" + code + "&state=" + state);
 
             if (call.getStatus().getCode() == Status.STATUS_OK) {
-                logger.debug("Switching the user was processed successfully.");
 
                 final String text = call.getText();
                 final JSONObject jsonObject = new JSONObject(text);

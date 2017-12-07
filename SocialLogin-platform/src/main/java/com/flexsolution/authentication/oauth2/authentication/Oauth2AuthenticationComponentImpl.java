@@ -33,11 +33,11 @@ import org.alfresco.repo.transaction.AlfrescoTransactionSupport;
 import java.util.stream.Stream;
 
 
-public class SimpleAcceptOrRejectAllAuthenticationComponentImpl extends AbstractAuthenticationComponent {
+public class Oauth2AuthenticationComponentImpl extends AbstractAuthenticationComponent {
 
     private boolean enabled;
 
-    public SimpleAcceptOrRejectAllAuthenticationComponentImpl() {
+    public Oauth2AuthenticationComponentImpl() {
         super();
     }
 

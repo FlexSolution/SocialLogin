@@ -41,9 +41,11 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 import org.springframework.extensions.webscripts.*;
+import org.springframework.extensions.webscripts.servlet.WebScriptServletRuntime;
 import org.springframework.http.MediaType;
 import org.springframework.social.oauth2.OAuth2Version;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -60,7 +62,6 @@ import java.util.Map;
 public class LinkedInSignInWebScript extends DeclarativeWebScript {
     private static Log logger = LogFactory.getLog(LinkedInSignInWebScript.class);
 
-    private SysAdminParams sysAdminParams;
     private AuthenticationService authenticationService;
     private PersonService personService;
     private NodeService nodeService;
@@ -68,7 +69,6 @@ public class LinkedInSignInWebScript extends DeclarativeWebScript {
     private Boolean testing;
 
     protected Map<String, Object> executeImpl(WebScriptRequest req, Status status, Cache cache) {
-
 
         String error = req.getParameter("error");
         if (StringUtils.isNotBlank(error)) {
@@ -83,8 +83,10 @@ public class LinkedInSignInWebScript extends DeclarativeWebScript {
         String code = req.getParameter("code");
         String state = req.getParameter("state");
 
-        if (!state.equals(state)) {//todo verify user CSRF code if not match
-            throw new WebScriptException(Status.STATUS_UNAUTHORIZED, "CSRF attack detected");
+        final HttpServletRequest httpServletRequest = WebScriptServletRuntime.getHttpServletRequest(req);
+        String sessionState = (String) httpServletRequest.getSession().getAttribute(Oauth2Session.OAUTH_2_STATE);
+        if (!state.equals(sessionState)) {
+            throw new WebScriptException(Status.STATUS_FORBIDDEN, "CSRF attack was detected");
         }
 
         String userName = null;
@@ -95,7 +97,7 @@ public class LinkedInSignInWebScript extends DeclarativeWebScript {
                 List<NameValuePair> params = new ArrayList<>();
                 params.add(new BasicNameValuePair("grant_type", "authorization_code"));
                 params.add(new BasicNameValuePair("code", code));
-                params.add(new BasicNameValuePair("redirect_uri", UrlUtil.getShareUrl(sysAdminParams) + "/service/api/social-login"));//todo config file
+//                params.add(new BasicNameValuePair("redirect_uri", UrlUtil.getShareUrl(sysAdminParams) + "/service/api/social-login"));//todo config file
                 params.add(new BasicNameValuePair("client_id", "78njxd1uv7zrvq"));//todo config file
                 params.add(new BasicNameValuePair("client_secret", "HIGUbb2OmjFIxkEG"));//todo config file
 
@@ -214,9 +216,9 @@ public class LinkedInSignInWebScript extends DeclarativeWebScript {
         }
     }
 
-    public void setSysAdminParams(SysAdminParams sysAdminParams) {
-        this.sysAdminParams = sysAdminParams;
-    }
+//    public void setSysAdminParams(SysAdminParams sysAdminParams) {
+//        this.sysAdminParams = sysAdminParams;
+//    }
 
     public void setAuthenticationService(AuthenticationService authenticationService) {
         this.authenticationService = authenticationService;

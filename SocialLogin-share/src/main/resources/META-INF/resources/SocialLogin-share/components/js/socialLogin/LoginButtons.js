@@ -48,18 +48,30 @@ var namespace = function (identifier) {
 
             showDialog: function (p_event, p_obj) {
 
-                // var url = YAHOO.lang.substitute("https://www.linkedin.com/oauth/v2/authorization?" +
-                var url = YAHOO.lang.substitute("https://www.linkedin.com/uas/oauth2/authorization?" +
-                    "response_type={response_type}&" +
-                    "redirect_uri={redirect_uri}&" +
-                    "state={state}&" +
-                    "client_id={client_id}", {
-                        response_type: "code",
-                        client_id: "78njxd1uv7zrvq",//todo from registered App
-                        redirect_uri: encodeURIComponent(location.origin + Alfresco.constants.URL_CONTEXT +  "service/api/social-login"),
-                        state:"ololo1_DCEeFWf45A53sdfKef424"//todo CSRF here
+                var templateUrl = YAHOO.lang.substitute(Alfresco.constants.URL_SERVICECONTEXT + "api/socialLogin/{api}/authorizationUrl", {
+                    api: "linkedIn"//todo other implementations
+                });
+
+                Alfresco.util.Ajax.request(
+                    {
+                        url: templateUrl,
+                        method: Alfresco.util.Ajax.GET,
+                        successCallback: {
+                            fn: function (response, p_obj) {
+                                var url = response.json.authorizationUrl;
+                                window.open(url, "_self");//todo popup
+                            },
+                            scope: this
+                        },
+                        failureCallback: {
+                            fn: function (response) {
+                                response = response.serverResponse ? YAHOO.lang.JSON.parse(response.serverResponse.responseText) : response;
+                                console.error(response);
+                                this.showSpinner(response, 10);
+                            },
+                            scope: this
+                        }
                     });
-                window.open(url,"_self");
             }
         });
 })();

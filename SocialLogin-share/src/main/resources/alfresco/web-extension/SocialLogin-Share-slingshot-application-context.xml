@@ -12,6 +12,12 @@
         <property name="webFrameworkConfiguration" ref="webframework.config.element"/>
     </bean>
 
+    <bean id="webscript.com.flexsolution.authentication.socialLogin.connector.authentication-url-proxy.get"
+          class="com.flexsolution.authentication.oauth2.webscript.AuthenticationURLProxy"
+          parent="webscript">
+        <property name="connectorService" ref="connector.service"/>
+    </bean>
+
     <!-- Add module specific messages and labels -->
     <bean id="com.flexsolution.resetPassword-share.resources"
           class="org.springframework.extensions.surf.util.ResourceBundleBootstrapComponent">

@@ -22,11 +22,17 @@
 	<bean id="webscript.com.flexsolution.authentication.oauth2.socialLogin.get"
 		  class="com.flexsolution.authentication.oauth2.webscript.LinkedInSignInWebScript"
 		  parent="webscript">
-		<property name="sysAdminParams" ref="sysAdminParams"/>
+		<!--<property name="sysAdminParams" ref="sysAdminParams"/>-->
 		<property name="authenticationService" ref="AuthenticationService"/>
 		<!--todo true for testing -->
 		<property name="testing" value="true"/>
 		<property name="personService" ref="PersonService"/>
 		<property name="nodeService" ref="NodeService"/>
 	</bean>
+
+    <bean id="webscript.com.flexsolution.authentication.oauth2.authorizationUrl.get"
+          class="com.flexsolution.authentication.oauth2.webscript.AuthorizationUrlWebScript"
+          parent="webscript">
+    </bean>
+
 </beans>

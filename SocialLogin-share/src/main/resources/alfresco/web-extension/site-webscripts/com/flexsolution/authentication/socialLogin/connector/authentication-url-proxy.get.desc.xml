@@ -1,0 +1,7 @@
+<webscript>
+    <shortname>AuthorizationUrl Proxy</shortname>
+    <url>/api/socialLogin/{api}/authorizationUrl</url>
+    <format default="json"/>
+    <authentication>none</authentication>
+    <transaction allow="readwrite">required</transaction>
+</webscript>
