@@ -1,7 +1,7 @@
 package com.flexsolution.authentication.oauth2.webscript;
 
+import org.alfresco.repo.content.MimetypeMap;
 import org.alfresco.web.site.SlingshotUserFactory;
-import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.json.JSONException;
@@ -26,6 +26,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
+import java.io.PrintWriter;
 
 /**
  * Created by max on 11/24/17 .
@@ -41,30 +42,17 @@ public class SocialSecure extends AbstractWebScript {
     @Override
     public void execute(WebScriptRequest req, WebScriptResponse res) throws IOException {
 
-        String error = req.getParameter("error");//todo error
-        if (StringUtils.isNotBlank(error)) {
-            System.out.println(error);
-            /*
-            user_cancelled_login - The user refused to login into LinkedIn account.
-            user_cancelled_authorize - The user refused to authorize permissions request from your application.
-             */
-            System.out.println(StringUtils.isNotBlank(req.getParameter("error_description")));
-        }
-
-        String code = req.getParameter("code");
-        String state = req.getParameter("state");
-
         final HttpServletRequest httpServletRequest = WebScriptServletRuntime.getHttpServletRequest(req);
         final HttpServletResponse servletResponse = WebScriptServletRuntime.getHttpServletResponse(res);
-
         HttpSession session = httpServletRequest.getSession(true);
 
         try {
             final Connector connector = connectorService.getConnector(WebFrameworkConstants.DEFAULT_ALFRESCO_ENDPOINT_ID, session);
 
-            final Response call = connector.call("/socialLogin?code=" + code + "&state=" + state);
+            final Response call = connector.call(constructUrl(req));
 
-            if (call.getStatus().getCode() == Status.STATUS_OK) {
+            int responseCode = call.getStatus().getCode();
+            if (Status.STATUS_OK == responseCode) {
 
                 final String text = call.getText();
                 final JSONObject jsonObject = new JSONObject(text);
@@ -89,11 +77,53 @@ public class SocialSecure extends AbstractWebScript {
                 connectorSession.setParameter(AlfrescoAuthenticator.CS_PARAM_ALF_TICKET, ticket);
                 connectorSession.setParameter(UserFactory.SESSION_ATTRIBUTE_EXTERNAL_AUTH, Boolean.TRUE.toString());
 
-                servletResponse.setStatus(Status.STATUS_FOUND);
+//                servletResponse.setStatus(Status.STATUS_FOUND);
+//                servletResponse.sendRedirect(req.getContextPath() +
+//                        ((SlingshotUserFactory) userFactory).getUserHomePage(ThreadLocalRequestContext.getRequestContext(),
+//                                user));
 
-                servletResponse.sendRedirect(req.getContextPath() +
-                        ((SlingshotUserFactory) userFactory).getUserHomePage(ThreadLocalRequestContext.getRequestContext(),
-                                user));
+
+                servletResponse.setStatus(Status.STATUS_OK);
+                try (PrintWriter writer = servletResponse.getWriter()) { //print error message for user
+                    writer.print("<html>\n" +
+                            "<head></head>\n" +
+                            "<body>\n" +
+                            "<div>Successfully authenticated</div>\n" +
+                            "<div>This window will be automatically closed in 5 sec...</div>\n" +
+                            "<script>\n" +
+                            "    window.setInterval(function () {\n" +
+                            "        window.close();\n" +
+                            "    }, 5000);\n" +
+                            "</script>\n" +
+                            "</body>\n" +
+                            "</html>");
+                    res.setContentType(MimetypeMap.MIMETYPE_HTML);
+                }
+
+
+            } else if (Status.STATUS_UNAUTHORIZED == responseCode || Status.STATUS_FORBIDDEN == responseCode) {
+                // receive description of the error
+                JSONObject jsonErrObject = new JSONObject(call.getText());
+                String message = jsonErrObject.getString("message");
+                logger.error("User token loading is failed due to an error :\n" + call.getText());
+                // set error status and message
+                servletResponse.setStatus(Status.STATUS_OK);
+                try (PrintWriter writer = servletResponse.getWriter()) { //print error message for user
+                    writer.print("<html>\n" +
+                            "<head></head>\n" +
+                            "<body>\n" +
+                            "<div>" + message + "/div>\n" +
+                            "<div>This window will be automatically closed in 5 sec...</div>\n" +
+                            "<script>\n" +
+                            "    window.setInterval(function () {\n" +
+                            "        window.close();\n" +
+                            "    }, 5000);\n" +
+                            "</script>\n" +
+                            "</body>\n" +
+                            "</html>");
+                    res.setContentType(MimetypeMap.MIMETYPE_HTML);
+                }
+
             } else {
                 // receive description of the error
                 JSONObject jsonErrObject = new JSONObject(call.getText());
@@ -110,14 +140,19 @@ public class SocialSecure extends AbstractWebScript {
         } catch (JSONException e) {
             logger.error("Could not parse response into json object", e);
             servletResponse.sendError(Status.STATUS_INTERNAL_SERVER_ERROR, e.getMessage());
-        } catch (UserFactoryException e) {
-            logger.error("Could not load user home page", e);
-            servletResponse.sendError(Status.STATUS_INTERNAL_SERVER_ERROR, e.getMessage());
+//        } catch (UserFactoryException e) {
+//            logger.error("Could not load user home page", e);
+//            servletResponse.sendError(Status.STATUS_INTERNAL_SERVER_ERROR, e.getMessage());
         } catch (CredentialVaultProviderException e) {
             logger.error("Could not load user Credential Vault", e);
             servletResponse.sendError(Status.STATUS_INTERNAL_SERVER_ERROR, e.getMessage());
             e.printStackTrace();
         }
+    }
+
+    private String constructUrl(WebScriptRequest req) {
+        String url = req.getURL();
+        return "/socialLogin" + url.substring(url.indexOf("?"), url.length());
     }
 
     /**

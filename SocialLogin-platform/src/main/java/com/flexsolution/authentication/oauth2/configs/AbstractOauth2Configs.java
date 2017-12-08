@@ -8,6 +8,8 @@ import org.alfresco.repo.admin.SysAdminParams;
 import org.alfresco.util.ParameterCheck;
 import org.alfresco.util.UrlUtil;
 import org.apache.commons.lang.CharEncoding;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHeaders;
 import org.apache.http.NameValuePair;
@@ -35,6 +37,8 @@ import java.util.List;
  * Created by max on 12/6/17 .
  */
 public abstract class AbstractOauth2Configs implements Oauth2Configs {
+
+    private final Log logger = LogFactory.getLog(this.getClass());
 
     private static final String SHARE_REDIRECT_URL = "/service/api/social-login";
     private static final String ARGUMENTS = "?response_type=%s&redirect_uri=%s&state=%s&client_id=%s";
@@ -135,7 +139,7 @@ public abstract class AbstractOauth2Configs implements Oauth2Configs {
 
                     String responseString = EntityUtils.toString(entity, CharEncoding.UTF_8);
 
-                    System.out.println(responseString);
+                    logger.debug(responseString);
 
                     return gson.fromJson(responseString, UserMetadata.class);
 

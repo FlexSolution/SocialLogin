@@ -67,17 +67,6 @@ public class SocialSignInWebScript extends DeclarativeWebScript {
 
     protected Map<String, Object> executeImpl(WebScriptRequest req, Status status, Cache cache) {
 
-        String error = req.getParameter(Oauth2Parameters.ERROR);
-        if (StringUtils.isNotBlank(error)) {
-            System.out.println(error);//todo error
-            /*
-            user_cancelled_login - The user refused to login into LinkedIn account.
-            user_cancelled_authorize - The user refused to authorize permissions request from your application.
-             */
-            System.out.println(StringUtils.isNotBlank(req.getParameter("error_description")));
-        }
-
-        String code = req.getParameter(Oauth2Parameters.CODE);
         String state = req.getParameter(Oauth2Parameters.STATE);
 
         String sessionState = (String) WebScriptUtils.getSessionAttribute(req, Oauth2Session.OAUTH_2_STATE);
@@ -85,10 +74,19 @@ public class SocialSignInWebScript extends DeclarativeWebScript {
             throw new WebScriptException(Status.STATUS_FORBIDDEN, "CSRF attack was detected");
         }
 
-//        WebScriptUtils.removeSessionAttribute(req, Oauth2Session.OAUTH_2_STATE);
+        String error = req.getParameter(Oauth2Parameters.ERROR);
+        if (StringUtils.isNotBlank(error)) {
+            /*
+            user_cancelled_login - The user refused to login into LinkedIn account.
+            user_cancelled_authorize - The user refused to authorize permissions request from your application.
+             */
+            String errorDescription = req.getParameter("error_description");
+            throw new WebScriptException(Status.STATUS_UNAUTHORIZED, error + ": " + errorDescription);
+        }
 
-        if (StringUtils.isBlank(code) && "null".equals(code)) {
-//            throw new WebScriptException(Status.STATUS_FORBIDDEN, "The user refused to login into LinkedIn account");
+        String code = req.getParameter(Oauth2Parameters.CODE);
+        if (StringUtils.isBlank(code)) {
+            throw new WebScriptException(Status.STATUS_UNAUTHORIZED, "'code' is mandatory parameter");
         }
 
         Oauth2Configs apiConfig = oauth2APIFactory.getAPIFromUserSession(req);

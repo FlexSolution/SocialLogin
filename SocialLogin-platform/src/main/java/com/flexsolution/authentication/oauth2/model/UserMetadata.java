@@ -9,7 +9,6 @@ import lombok.ToString;
  */
 @Setter
 @Getter
-@ToString
 public class UserMetadata {
 
     private String id;
@@ -24,13 +23,21 @@ public class UserMetadata {
 
     private Location location = new Location();
 
+    @Override
+    public String toString() {
+        return "UserMetadata{" +
+                "id='" + id + '\'' +
+                ", firstName='" + firstName + '\'' +
+                ", lastName='" + lastName + '\'' +
+                '}';
+    }
 
     /*
-    "location": {
-        "country": {"code": "ua"},
-        "name": "Ukraine"
-     }
-     */
+        "location": {
+            "country": {"code": "ua"},
+            "name": "Ukraine"
+         }
+         */
     @Setter
     @Getter
     @ToString
