@@ -68,8 +68,6 @@
                 <connector-id>alfresco</connector-id>
                 <endpoint-url>${alfresco.repo.url}/s</endpoint-url>
                 <identity>user</identity>
-                <!--todo filter -->
-                <!--<external-auth>true</external-auth>-->
             </endpoint>
 
             <endpoint>
