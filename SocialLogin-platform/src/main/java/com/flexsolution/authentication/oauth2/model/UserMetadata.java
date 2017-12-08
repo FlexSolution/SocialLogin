@@ -17,18 +17,55 @@ public class UserMetadata {
     private String lastName;
     private String emailAddress;
     private String pictureUrl;
+    private String industry;
+    private String headline;
+    private String publicProfileUrl;
+    private String summary;
 
-                        /*
-                    {
-  "emailAddress": "test@flex-solution.com",
-  "firstName": "test first name",
-  "id": "MUX4KjhJev",
-  "lastName": "test last name",
-  "location": {
-    "country": {"code": "ua"},
-    "name": "Ukraine"
-  },
-  "pictureUrl": "https://media.licdn.com/mpr/mprx/0_PKKbUcCRdDsMtoqF_Tu3RaYYdDVMtERb5Tu8adijJCcytQBb5MSLf9_ZeCRKnkNC6nS3R9GZR4UJ3UbmrR3Hu2CRu4UM3UQk5R3H0DiRu4BJ3UM7ka2iSJ7AsibvKDcfrhjeJ91tu7oKC0nH97bGsI"
+    private Location location = new Location();
+
+
+    /*
+    "location": {
+        "country": {"code": "ua"},
+        "name": "Ukraine"
+     }
+     */
+    @Setter
+    @Getter
+    @ToString
+    public class Location {
+        private String name;
+    }
+
+
+  /*
+  "positions": {
+    "_total": 2,
+    "values": [
+      {
+        "company": {"name": "test"},
+        "id": 1145998991,
+        "isCurrent": true,
+        "location": {},
+        "title": "Test"
+      },
+      {
+        "company": {"name": "test company"},
+        "id": 1162140752,
+        "isCurrent": true,
+        "location": {
+          "country": {
+            "code": "ua",
+            "name": "Ukraine"
+          },
+          "name": "Ukraine"
+        },
+        "startDate": {"year": 2016},
+        "title": "Tester title"
+      }
+    ]
+  }
 }
-                     */
+ */
 }

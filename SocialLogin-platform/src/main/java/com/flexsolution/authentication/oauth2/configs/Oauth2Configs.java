@@ -15,4 +15,8 @@ public interface Oauth2Configs {
     AccessToken getAccessToken(String code);
 
     UserMetadata getUserMetadata(AccessToken accessToken);
+
+    String getUserNamePrefix();
+
+    String getAvatarName();
 }

@@ -55,7 +55,7 @@ public abstract class AbstractOauth2Configs implements Oauth2Configs {
 
     protected abstract String getAuthorizationURL();
 
-    protected abstract String getUSerDataUrl();
+    protected abstract String getUserDataUrl();
 
 
     private String getRedirectURL() {
@@ -118,7 +118,7 @@ public abstract class AbstractOauth2Configs implements Oauth2Configs {
     public UserMetadata getUserMetadata(AccessToken accessToken) {
 
         try (CloseableHttpClient httpclient = HttpClients.custom().build()) {
-            HttpGet get = new HttpGet(getUSerDataUrl());//todo config file
+            HttpGet get = new HttpGet(getUserDataUrl());
             get.setHeader(X_LI_FORMAT, WebScriptResponse.JSON_FORMAT);
             get.setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
             get.setHeader(HttpHeaders.AUTHORIZATION, OAuth2Version.BEARER.getAuthorizationHeaderValue(accessToken.getAccess_token()));
@@ -137,11 +137,7 @@ public abstract class AbstractOauth2Configs implements Oauth2Configs {
 
                     System.out.println(responseString);
 
-                    UserMetadata userMetadata = gson.fromJson(responseString, UserMetadata.class);
-
-                    //todo more details
-
-                    return userMetadata;
+                    return gson.fromJson(responseString, UserMetadata.class);
 
                 } else {
                     throw new WebScriptException(Status.STATUS_UNAUTHORIZED, entity.toString());//todo test

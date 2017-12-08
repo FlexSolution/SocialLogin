@@ -25,11 +25,13 @@ import com.flexsolution.authentication.oauth2.constant.Oauth2Transaction;
 import com.flexsolution.authentication.oauth2.model.AccessToken;
 import com.flexsolution.authentication.oauth2.model.UserMetadata;
 import org.alfresco.model.ContentModel;
+import org.alfresco.repo.content.MimetypeMap;
 import org.alfresco.repo.transaction.AlfrescoTransactionSupport;
-import org.alfresco.service.cmr.model.FileFolderService;
 import org.alfresco.service.cmr.repository.*;
 import org.alfresco.service.cmr.security.AuthenticationService;
 import org.alfresco.service.cmr.security.PersonService;
+import org.alfresco.service.namespace.NamespaceService;
+import org.alfresco.service.namespace.QName;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -37,10 +39,12 @@ import org.springframework.extensions.webscripts.*;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Serializable;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * A demonstration Java controller for the Hello World Web Script.
@@ -65,7 +69,7 @@ public class SocialSignInWebScript extends DeclarativeWebScript {
 
         String error = req.getParameter(Oauth2Parameters.ERROR);
         if (StringUtils.isNotBlank(error)) {
-            System.out.println(error);
+            System.out.println(error);//todo error
             /*
             user_cancelled_login - The user refused to login into LinkedIn account.
             user_cancelled_authorize - The user refused to authorize permissions request from your application.
@@ -81,7 +85,7 @@ public class SocialSignInWebScript extends DeclarativeWebScript {
             throw new WebScriptException(Status.STATUS_FORBIDDEN, "CSRF attack was detected");
         }
 
-        WebScriptUtils.removeSessionAttribute(req, Oauth2Session.OAUTH_2_STATE);
+//        WebScriptUtils.removeSessionAttribute(req, Oauth2Session.OAUTH_2_STATE);
 
         if (StringUtils.isBlank(code) && "null".equals(code)) {
 //            throw new WebScriptException(Status.STATUS_FORBIDDEN, "The user refused to login into LinkedIn account");
@@ -93,7 +97,7 @@ public class SocialSignInWebScript extends DeclarativeWebScript {
 
         UserMetadata userMetadata = apiConfig.getUserMetadata(accessToken);
 
-        String userName = "social_" + userMetadata.getId();
+        String userName = apiConfig.getUserNamePrefix() + userMetadata.getId();
 
         AlfrescoTransactionSupport.bindResource(Oauth2Transaction.AUTHENTICATION_USER_NAME, userName);
 
@@ -102,13 +106,22 @@ public class SocialSignInWebScript extends DeclarativeWebScript {
         NodeRef personOrNull = personService.getPersonOrNull(userName);
 
         if (personOrNull != null) {
-            //todo move in the oauth subsystem
             nodeService.setProperty(personOrNull, ContentModel.PROP_FIRSTNAME, userMetadata.getFirstName());
             nodeService.setProperty(personOrNull, ContentModel.PROP_LASTNAME, userMetadata.getLastName());
             nodeService.setProperty(personOrNull, ContentModel.PROP_EMAIL, userMetadata.getEmailAddress());
+            nodeService.setProperty(personOrNull, ContentModel.PROP_LOCATION, userMetadata.getLocation().getName());
+            Optional<String> industry = Optional.ofNullable(userMetadata.getIndustry());
+            Optional<String> headline =  Optional.ofNullable(userMetadata.getHeadline());
+            StringBuilder jobTitle = new StringBuilder();
+            industry.ifPresent(jobTitle::append);
+            if(industry.isPresent() && headline.isPresent()) {
+                jobTitle.append(", ");
+            }
+            headline.ifPresent(jobTitle::append);
+            nodeService.setProperty(personOrNull, ContentModel.PROP_JOBTITLE, jobTitle.toString());
+            contentService.getWriter(personOrNull, ContentModel.PROP_PERSONDESC, true).putContent(userMetadata.getSummary());
 
-//            updateUserAvatar(personOrNull, userMetadata);//todo fix it!!!!!!!!!!!!!!
-
+            updateUserAvatar(personOrNull, userMetadata, apiConfig.getAvatarName());
         } else {
             throw new WebScriptException(Status.STATUS_INTERNAL_SERVER_ERROR, "User " +
                     userMetadata + " was not created automatically by authentication chain");
@@ -123,35 +136,40 @@ public class SocialSignInWebScript extends DeclarativeWebScript {
         return model;
     }
 
-    @Deprecated //todo fix it!!!!!!!!!!!!
-    private void updateUserAvatar(NodeRef personOrNull, UserMetadata userMetadata) {
+
+    //todo do not overwrite if not changed!
+    private void updateUserAvatar(NodeRef personOrNull, UserMetadata userMetadata, String avatarName) {
         // ensure cm:person has 'cm:preferences' aspect applied - as we want to add the avatar as
         // the child node of the 'cm:preferenceImage' association
-        if (nodeService.hasAspect(personOrNull, ContentModel.ASPECT_PREFERENCES)) {
+        if (!nodeService.hasAspect(personOrNull, ContentModel.ASPECT_PREFERENCES)) {
             nodeService.addAspect(personOrNull, ContentModel.ASPECT_PREFERENCES, null);
         }
         // remove old image child node if we already have one
         List<ChildAssociationRef> childAssoc = nodeService.getChildAssocs(personOrNull,
                 ContentModel.ASSOC_PREFERENCE_IMAGE, null, 1, false);
-        if (!childAssoc.isEmpty()){
+        if (!childAssoc.isEmpty()) {
             nodeService.deleteNode(childAssoc.get(0).getChildRef());
         }
 
-        ChildAssociationRef associationRef = nodeService.createNode(personOrNull, ContentModel.ASSOC_CONTAINS, ContentModel.ASSOC_PREFERENCE_IMAGE, ContentModel.TYPE_CONTENT);
+        Map<QName, Serializable> map = new HashMap<>();
+        map.put(ContentModel.PROP_NAME, avatarName);
+        ChildAssociationRef associationRef = nodeService.createNode(personOrNull, ContentModel.ASSOC_PREFERENCE_IMAGE,
+                QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, QName.createValidLocalName(avatarName)),
+                ContentModel.TYPE_CONTENT, map);
         NodeRef newImageNodeRef = associationRef.getChildRef();
 
         try (InputStream inputStream = new URL(userMetadata.getPictureUrl()).openStream()) {
             ContentWriter writer = contentService.getWriter(newImageNodeRef, ContentModel.PROP_CONTENT, true);
+            writer.setMimetype(MimetypeMap.MIMETYPE_IMAGE_JPEG);//for LinkedIn avatar
             writer.putContent(inputStream);
-            writer.guessMimetype(null);
         } catch (IOException e) {
             logger.error("Can not load user logo, ", e);
-            e.printStackTrace();
+            e.printStackTrace();// continue here without logo
         }
 //         wire up 'cm:avatar' target association - backward compatible with JSF web-client avatar
         List<ChildAssociationRef> childAssocOldAvatar = nodeService.getChildAssocs(personOrNull,
                 ContentModel.ASSOC_AVATAR, null, 1, false);
-        if (!childAssocOldAvatar.isEmpty()){
+        if (!childAssocOldAvatar.isEmpty()) {
             nodeService.removeAssociation(personOrNull, childAssocOldAvatar.get(0).getChildRef(), ContentModel.ASSOC_AVATAR);
         }
 
