@@ -1,0 +1,6 @@
+<webscript>
+    <shortname>Social Login</shortname>
+    <url>/api/social-login</url>
+    <authentication>none</authentication>
+    <transaction allow="readwrite">required</transaction>
+</webscript>
