@@ -123,8 +123,9 @@ public class SocialSignInWebScript extends DeclarativeWebScript {
             }
             headline.ifPresent(jobTitle::append);
             nodeService.setProperty(personOrNull, ContentModel.PROP_JOBTITLE, jobTitle.toString());
-            Optional.ofNullable(contentService.getWriter(personOrNull, ContentModel.PROP_PERSONDESC, true))
-                    .ifPresent(w -> w.putContent(userMetadata.getSummary()));
+            Optional.ofNullable(userMetadata.getSummary()).ifPresent(s ->
+                    Optional.ofNullable(contentService.getWriter(personOrNull, ContentModel.PROP_PERSONDESC, true))
+                            .ifPresent(w -> w.putContent(s)));
 
             updateUserAvatar(personOrNull, userMetadata, apiConfig.getAvatarName());
         } else {
