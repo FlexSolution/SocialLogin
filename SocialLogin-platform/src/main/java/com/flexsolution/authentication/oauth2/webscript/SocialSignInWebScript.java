@@ -104,20 +104,27 @@ public class SocialSignInWebScript extends DeclarativeWebScript {
         NodeRef personOrNull = personService.getPersonOrNull(userName);
 
         if (personOrNull != null) {
+            // ensure cm:person has 'cm:preferences' aspect applied - as we want to add the avatar as
+            // the child node of the 'cm:preferenceImage' association
+            if (!nodeService.hasAspect(personOrNull, ContentModel.ASPECT_PREFERENCES)) {
+                nodeService.addAspect(personOrNull, ContentModel.ASPECT_PREFERENCES, null);
+            }
+
             nodeService.setProperty(personOrNull, ContentModel.PROP_FIRSTNAME, userMetadata.getFirstName());
             nodeService.setProperty(personOrNull, ContentModel.PROP_LASTNAME, userMetadata.getLastName());
             nodeService.setProperty(personOrNull, ContentModel.PROP_EMAIL, userMetadata.getEmailAddress());
             nodeService.setProperty(personOrNull, ContentModel.PROP_LOCATION, userMetadata.getLocation().getName());
             Optional<String> industry = Optional.ofNullable(userMetadata.getIndustry());
-            Optional<String> headline =  Optional.ofNullable(userMetadata.getHeadline());
+            Optional<String> headline = Optional.ofNullable(userMetadata.getHeadline());
             StringBuilder jobTitle = new StringBuilder();
             industry.ifPresent(jobTitle::append);
-            if(industry.isPresent() && headline.isPresent()) {
+            if (industry.isPresent() && headline.isPresent()) {
                 jobTitle.append(", ");
             }
             headline.ifPresent(jobTitle::append);
             nodeService.setProperty(personOrNull, ContentModel.PROP_JOBTITLE, jobTitle.toString());
-            contentService.getWriter(personOrNull, ContentModel.PROP_PERSONDESC, true).putContent(userMetadata.getSummary());
+            Optional.ofNullable(contentService.getWriter(personOrNull, ContentModel.PROP_PERSONDESC, true))
+                    .ifPresent(w -> w.putContent(userMetadata.getSummary()));
 
             updateUserAvatar(personOrNull, userMetadata, apiConfig.getAvatarName());
         } else {
@@ -137,11 +144,7 @@ public class SocialSignInWebScript extends DeclarativeWebScript {
 
     //todo do not overwrite if not changed!
     private void updateUserAvatar(NodeRef personOrNull, UserMetadata userMetadata, String avatarName) {
-        // ensure cm:person has 'cm:preferences' aspect applied - as we want to add the avatar as
-        // the child node of the 'cm:preferenceImage' association
-        if (!nodeService.hasAspect(personOrNull, ContentModel.ASPECT_PREFERENCES)) {
-            nodeService.addAspect(personOrNull, ContentModel.ASPECT_PREFERENCES, null);
-        }
+
         // remove old image child node if we already have one
         List<ChildAssociationRef> childAssoc = nodeService.getChildAssocs(personOrNull,
                 ContentModel.ASSOC_PREFERENCE_IMAGE, null, 1, false);
