@@ -1,10 +1,16 @@
 package com.flexsolution.authentication.oauth2.configs;
 
 import com.flexsolution.authentication.oauth2.constant.Oauth2Parameters;
-import com.flexsolution.authentication.oauth2.model.AccessToken;
-import com.flexsolution.authentication.oauth2.model.UserMetadata;
+import com.flexsolution.authentication.oauth2.dto.AccessToken;
+import com.flexsolution.authentication.oauth2.dto.UserMetadata;
+import com.flexsolution.authentication.oauth2.model.Oauth2ConfigModel;
+import com.flexsolution.authentication.oauth2.util.ResourceService;
 import com.google.gson.Gson;
 import org.alfresco.repo.admin.SysAdminParams;
+import org.alfresco.repo.security.authentication.AuthenticationUtil;
+import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.service.namespace.QName;
 import org.alfresco.util.ParameterCheck;
 import org.alfresco.util.UrlUtil;
 import org.apache.commons.lang.CharEncoding;
@@ -38,28 +44,28 @@ import java.util.List;
  */
 public abstract class AbstractOauth2Configs implements Oauth2Configs {
 
-    private final Log logger = LogFactory.getLog(this.getClass());
-
+    public static final String OAUTH2_CONFIG_NODE_PATH = "Data Dictionary/fs.oauth2.config";
     private static final String SHARE_REDIRECT_URL = "/service/api/social-login";
     private static final String ARGUMENTS = "?response_type=%s&redirect_uri=%s&state=%s&client_id=%s";
-
     private static final String AUTHORIZATION_CODE = "authorization_code";
     private static final String CODE = "code";
     private static final String X_LI_FORMAT = "x-li-format";
-
+    private final Log logger = LogFactory.getLog(this.getClass());
+    private NodeService nodeService;
     private String apiName;
     private SysAdminParams sysAdminParams;
     private Oauth2APIFactoryRegisterInterface registerAPI;
-
-    abstract String getSecretKey();
+    private ResourceService resourceService;
 
     abstract String getAccessTokenURL();
 
-    protected abstract String getClientId();
+    abstract QName getClientIdQName();
 
-    protected abstract String getAuthorizationURL();
+    abstract QName getSecretKeyQName();
 
-    protected abstract String getUserDataUrl();
+    abstract String getAuthorizationURL();
+
+    abstract String getUserDataUrl();
 
 
     private String getRedirectURL() {
@@ -152,10 +158,27 @@ public abstract class AbstractOauth2Configs implements Oauth2Configs {
         }
     }
 
+    private NodeRef getOauth2ConfigFile() {
+        return resourceService.getNode(OAUTH2_CONFIG_NODE_PATH, Oauth2ConfigModel.TYPE_OAUTH2_CONFIG);
+    }
+
 
     private String encode(String value) throws UnsupportedEncodingException {
         return URLEncoder.encode(value, CharEncoding.UTF_8);
     }
+
+    private String getClientId() {
+        return AuthenticationUtil.runAs(() ->
+                        (String) nodeService.getProperty(getOauth2ConfigFile(), getClientIdQName()),
+                AuthenticationUtil.getAdminUserName());
+    }
+
+    private String getSecretKey() {
+        return AuthenticationUtil.runAs(() ->
+                        (String) nodeService.getProperty(getOauth2ConfigFile(), getSecretKeyQName()),
+                AuthenticationUtil.getAdminUserName());
+    }
+
 
     public void setSysAdminParams(SysAdminParams sysAdminParams) {
         this.sysAdminParams = sysAdminParams;
@@ -167,6 +190,14 @@ public abstract class AbstractOauth2Configs implements Oauth2Configs {
 
     public void setRegisterAPI(Oauth2APIFactoryRegisterInterface registerAPI) {
         this.registerAPI = registerAPI;
+    }
+
+    public void setResourceService(ResourceService resourceService) {
+        this.resourceService = resourceService;
+    }
+
+    public void setNodeService(NodeService nodeService) {
+        this.nodeService = nodeService;
     }
 
     private void init() {

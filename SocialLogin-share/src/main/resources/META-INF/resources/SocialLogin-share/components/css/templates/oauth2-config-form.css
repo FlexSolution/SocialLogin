@@ -1,0 +1,17 @@
+.oauth2-config-form-container {
+    width: 800px;
+}
+
+.oauth2-config-form-container input.general,
+.oauth2-config-form-container input.details {
+    width: 99.5%;
+}
+
+.oauth2-config-form-container input.column2-general,
+.oauth2-config-form-container input.column2-details-1 {
+    width: 98.8%;
+}
+
+.oauth2-config-form-container input.column3-contact {
+    width: 98.5%;
+}

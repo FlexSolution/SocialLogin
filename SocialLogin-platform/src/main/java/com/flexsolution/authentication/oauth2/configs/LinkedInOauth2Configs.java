@@ -1,5 +1,8 @@
 package com.flexsolution.authentication.oauth2.configs;
 
+import com.flexsolution.authentication.oauth2.model.Oauth2ConfigModel;
+import org.alfresco.service.namespace.QName;
+
 /**
  * Created by max on 12/6/17 .
  */
@@ -19,23 +22,23 @@ public class LinkedInOauth2Configs extends AbstractOauth2Configs {
     }
 
     @Override
-    public String getAuthorizationURL() {
+    String getAuthorizationURL() {
         return AUTHORIZATION_URL;
     }
 
     @Override
-    protected String getUserDataUrl() {
+    String getUserDataUrl() {
         return USER_DATA_URL;
     }
 
     @Override
-    public String getClientId() {
-        return "78njxd1uv7zrvq";//todo config
+    QName getClientIdQName() {
+        return Oauth2ConfigModel.PROP_LINKED_IN_CLIENT_ID;
     }
 
     @Override
-    public String getSecretKey() {
-        return "HIGUbb2OmjFIxkEG";//todo config
+    QName getSecretKeyQName() {
+        return Oauth2ConfigModel.PROP_LINKED_IN_SECRET_KEY;
     }
 
     @Override

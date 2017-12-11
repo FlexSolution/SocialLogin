@@ -19,4 +19,9 @@
         <property name="oauth2APIFactory" ref="oauth2APIFactoryBean"/>
     </bean>
 
+    <bean id="webscript.com.flexsolution.authentication.oauth2.node-config.get" parent="webscript"
+          class="com.flexsolution.authentication.oauth2.webscript.Oauth2ConfigNodeWebScript">
+        <property name="resourceService" ref="resourceService"/>
+    </bean>
+
 </beans>

@@ -1,4 +1,4 @@
-package com.flexsolution.authentication.oauth2.model;
+package com.flexsolution.authentication.oauth2.dto;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -6,9 +6,6 @@ import lombok.Setter;
 
 @Setter
 @Getter
-        /*
-         * https://developer.linkedin.com/docs/oauth2
-         */
 public class AccessToken {
     /***
      * The access token for the user.  This value must be kept secure, as per your agreement to the

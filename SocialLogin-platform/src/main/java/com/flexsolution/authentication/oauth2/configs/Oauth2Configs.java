@@ -1,7 +1,7 @@
 package com.flexsolution.authentication.oauth2.configs;
 
-import com.flexsolution.authentication.oauth2.model.AccessToken;
-import com.flexsolution.authentication.oauth2.model.UserMetadata;
+import com.flexsolution.authentication.oauth2.dto.AccessToken;
+import com.flexsolution.authentication.oauth2.dto.UserMetadata;
 
 import java.io.UnsupportedEncodingException;
 
