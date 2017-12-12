@@ -28,10 +28,13 @@ import com.flexsolution.authentication.oauth2.dto.UserMetadata;
 import com.flexsolution.authentication.oauth2.util.ImageComparator;
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.content.MimetypeMap;
+import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.repo.transaction.AlfrescoTransactionSupport;
 import org.alfresco.service.cmr.repository.*;
 import org.alfresco.service.cmr.security.AuthenticationService;
+import org.alfresco.service.cmr.security.AuthorityService;
 import org.alfresco.service.cmr.security.PersonService;
+import org.alfresco.service.namespace.NamespacePrefixResolver;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 import org.apache.commons.lang.StringUtils;
@@ -43,10 +46,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
 import java.net.URL;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * A demonstration Java controller for the Hello World Web Script.
@@ -67,6 +67,8 @@ public class SocialSignInWebScript extends DeclarativeWebScript {
     private NodeService nodeService;
     private Oauth2APIFactory oauth2APIFactory;
     private ContentService contentService;
+    private AuthorityService authorityService;
+    private NamespacePrefixResolver namespacePrefixResolver;
 
     protected Map<String, Object> executeImpl(WebScriptRequest req, Status status, Cache cache) {
 
@@ -110,6 +112,26 @@ public class SocialSignInWebScript extends DeclarativeWebScript {
         authenticationService.authenticate(userName, "1".toCharArray());//any password
 
         NodeRef personOrNull = personService.getPersonOrNull(userName);
+
+
+        //todo fix stability
+//        Set<String> authorityZones = authorityService.getAuthorityZones(userName);
+//
+//        String zone = AuthorityService.ZONE_AUTH_EXT_PREFIX + "flex_oauth2";
+//        if (!authorityZones.contains(zone)){
+//
+//            Set<String> authorityZonesNew = new HashSet<>();
+//            authorityZonesNew.add(zone);
+//
+//            AuthenticationUtil.runAs(() ->          {
+////                        NodeRef orCreateZone = authorityService.getOrCreateZone(zone);
+//
+//                        authorityService.addAuthorityToZones(userName, authorityZonesNew);
+//                        return null;
+//                    },
+//                    AuthenticationUtil.getAdminUserName());
+//
+//        }
 
         if (personOrNull != null) {
             // ensure cm:person has 'cm:preferences' aspect applied - as we want to add the avatar as
@@ -231,5 +253,13 @@ public class SocialSignInWebScript extends DeclarativeWebScript {
 
     public void setContentService(ContentService contentService) {
         this.contentService = contentService;
+    }
+
+    public void setAuthorityService(AuthorityService authorityService) {
+        this.authorityService = authorityService;
+    }
+
+    public void setNamespacePrefixResolver(NamespacePrefixResolver namespacePrefixResolver) {
+        this.namespacePrefixResolver = namespacePrefixResolver;
     }
 }
