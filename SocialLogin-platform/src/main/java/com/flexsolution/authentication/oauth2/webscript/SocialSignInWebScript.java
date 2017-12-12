@@ -18,7 +18,8 @@
 package com.flexsolution.authentication.oauth2.webscript;
 
 import com.flexsolution.authentication.oauth2.configs.Oauth2APIFactory;
-import com.flexsolution.authentication.oauth2.configs.Oauth2Configs;
+import com.flexsolution.authentication.oauth2.configs.Oauth2Config;
+import com.flexsolution.authentication.oauth2.configs.Oauth2Exception;
 import com.flexsolution.authentication.oauth2.constant.Oauth2Parameters;
 import com.flexsolution.authentication.oauth2.constant.Oauth2Session;
 import com.flexsolution.authentication.oauth2.constant.Oauth2Transaction;
@@ -89,13 +90,18 @@ public class SocialSignInWebScript extends DeclarativeWebScript {
             throw new WebScriptException(Status.STATUS_UNAUTHORIZED, "'code' is mandatory parameter");
         }
 
-        Oauth2Configs apiConfig = oauth2APIFactory.getAPIFromUserSession(req);
+        Oauth2Config apiConfig;
+        try {
+            apiConfig = oauth2APIFactory.getAPIFromUserSession(req);
+        } catch (Oauth2Exception e) {
+            throw new WebScriptException(Status.STATUS_NOT_FOUND, e.getMessage(), e);
+        }
 
         AccessToken accessToken = apiConfig.getAccessToken(code);
 
         UserMetadata userMetadata = apiConfig.getUserMetadata(accessToken);
 
-        String userName = apiConfig.getUserNamePrefix() + userMetadata.getId();
+        String userName = apiConfig.getUserNamePrefix() + "_" + userMetadata.getId();
 
         AlfrescoTransactionSupport.bindResource(Oauth2Transaction.AUTHENTICATION_USER_NAME, userName);
 

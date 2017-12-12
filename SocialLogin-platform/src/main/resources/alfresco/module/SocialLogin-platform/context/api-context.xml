@@ -15,7 +15,7 @@
 
     <bean id="linkedInOauth2Config" class="com.flexsolution.authentication.oauth2.configs.LinkedInOauth2Configs"
           parent="abstractOauth2Configs">
-        <property name="apiName" value="linkedIn"/>
+        <property name="labelKey" value="button.linkedIn"/>
     </bean>
 
     <bean id="oauth2APIFactoryBean" class="com.flexsolution.authentication.oauth2.configs.Oauth2APIFactoryImpl"/>

@@ -2,6 +2,7 @@ package com.flexsolution.authentication.oauth2.configs;
 
 import com.flexsolution.authentication.oauth2.constant.Oauth2Parameters;
 import com.flexsolution.authentication.oauth2.dto.AccessToken;
+import com.flexsolution.authentication.oauth2.dto.SocialButton;
 import com.flexsolution.authentication.oauth2.dto.UserMetadata;
 import com.flexsolution.authentication.oauth2.model.Oauth2ConfigModel;
 import com.flexsolution.authentication.oauth2.util.ResourceService;
@@ -42,7 +43,7 @@ import java.util.List;
 /**
  * Created by max on 12/6/17 .
  */
-public abstract class AbstractOauth2Configs implements Oauth2Configs {
+public abstract class AbstractOauth2Configs implements Oauth2Config {
 
     public static final String OAUTH2_CONFIG_NODE_PATH = "Data Dictionary/fs.oauth2.config";
     private static final String SHARE_REDIRECT_URL = "/service/api/social-login";
@@ -52,16 +53,18 @@ public abstract class AbstractOauth2Configs implements Oauth2Configs {
     private static final String X_LI_FORMAT = "x-li-format";
     private final Log logger = LogFactory.getLog(this.getClass());
     private NodeService nodeService;
-    private String apiName;
     private SysAdminParams sysAdminParams;
     private Oauth2APIFactoryRegisterInterface registerAPI;
     private ResourceService resourceService;
+    private String labelKey;
 
     abstract String getAccessTokenURL();
 
     abstract QName getClientIdQName();
 
     abstract QName getSecretKeyQName();
+
+    abstract QName getQNameForEnableField();
 
     abstract String getAuthorizationURL();
 
@@ -158,6 +161,18 @@ public abstract class AbstractOauth2Configs implements Oauth2Configs {
         }
     }
 
+    @Override
+    public boolean isEnabled() {
+        return AuthenticationUtil.runAs(() ->
+                        Boolean.TRUE.equals(nodeService.getProperty(getOauth2ConfigFile(), getQNameForEnableField())),
+                AuthenticationUtil.getAdminUserName());
+    }
+    
+    @Override
+    public SocialButton getSocialButton() {
+        return new SocialButton(getApiName(), labelKey);
+    }
+
     private NodeRef getOauth2ConfigFile() {
         return resourceService.getNode(OAUTH2_CONFIG_NODE_PATH, Oauth2ConfigModel.TYPE_OAUTH2_CONFIG);
     }
@@ -184,10 +199,6 @@ public abstract class AbstractOauth2Configs implements Oauth2Configs {
         this.sysAdminParams = sysAdminParams;
     }
 
-    public void setApiName(String apiName) {
-        this.apiName = apiName;
-    }
-
     public void setRegisterAPI(Oauth2APIFactoryRegisterInterface registerAPI) {
         this.registerAPI = registerAPI;
     }
@@ -200,7 +211,11 @@ public abstract class AbstractOauth2Configs implements Oauth2Configs {
         this.nodeService = nodeService;
     }
 
+    public void setLabelKey(String labelKey) {
+        this.labelKey = labelKey;
+    }
+
     private void init() {
-        registerAPI.registerAPI(this, apiName);
+        registerAPI.registerAPI(this, getApiName());
     }
 }

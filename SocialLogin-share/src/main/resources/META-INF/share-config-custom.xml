@@ -10,7 +10,7 @@
                     <hide id="cm:isContentIndexed"/>
                 </field-visibility>
                 <appearance>
-                    <set id="linkedInSet" appearance="title" label-id="LinkedIn Config"
+                    <set id="linkedInSet" appearance="title" label-id="LinkedIn"
                          template="/org/alfresco/components/form/2-column-set.ftl"/>
                     <set id="linkedInSet-checkbox" appearance=""/>
                     <field id="fs:LinkedInClientId" set="linkedInSet"/>

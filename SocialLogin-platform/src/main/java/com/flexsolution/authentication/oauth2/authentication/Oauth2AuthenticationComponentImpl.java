@@ -25,6 +25,9 @@
  */
 package com.flexsolution.authentication.oauth2.authentication;
 
+import com.flexsolution.authentication.oauth2.configs.Oauth2APIFactory;
+import com.flexsolution.authentication.oauth2.configs.Oauth2Config;
+import com.flexsolution.authentication.oauth2.configs.Oauth2Exception;
 import com.flexsolution.authentication.oauth2.constant.Oauth2Transaction;
 import com.flexsolution.authentication.oauth2.webscript.SocialSignInWebScript;
 import org.alfresco.repo.security.authentication.AbstractAuthenticationComponent;
@@ -36,19 +39,27 @@ import java.util.stream.Stream;
 
 public class Oauth2AuthenticationComponentImpl extends AbstractAuthenticationComponent {
 
-    private boolean enabled;
+    private Oauth2APIFactory oauth2APIFactory;
 
     public Oauth2AuthenticationComponentImpl() {
         super();
     }
 
     public void authenticateImpl(String userName, char[] password) throws AuthenticationException {
-        if (enabled && userName.equals(AlfrescoTransactionSupport.getResource(Oauth2Transaction.AUTHENTICATION_USER_NAME)) &&
-                // double check if it is called from our web script
-                Stream.of(Thread.currentThread().getStackTrace()).anyMatch(s ->
-                        SocialSignInWebScript.class.getName().equals(s.getClassName()))) {
-            setCurrentUser(userName);
-        } else {
+
+        try {
+            String apiName = userName.substring(0, userName.indexOf("_"));
+            Oauth2Config apiConfig = oauth2APIFactory.findApiConfig(apiName);
+
+            if (apiConfig.isEnabled() && userName.equals(AlfrescoTransactionSupport.getResource(Oauth2Transaction.AUTHENTICATION_USER_NAME)) &&
+                    // double check if it is called from our web script
+                    Stream.of(Thread.currentThread().getStackTrace()).anyMatch(s ->
+                            SocialSignInWebScript.class.getName().equals(s.getClassName()))) {
+                setCurrentUser(userName);
+            } else {
+                throw new AuthenticationException("Access Denied");
+            }
+        } catch (Oauth2Exception e) {
             throw new AuthenticationException("Access Denied");
         }
     }
@@ -58,7 +69,7 @@ public class Oauth2AuthenticationComponentImpl extends AbstractAuthenticationCom
         return false;
     }
 
-    public void setEnabled(Boolean enabled) {
-        this.enabled = enabled;
+    public void setOauth2APIFactory(Oauth2APIFactory oauth2APIFactory) {
+        this.oauth2APIFactory = oauth2APIFactory;
     }
 }
