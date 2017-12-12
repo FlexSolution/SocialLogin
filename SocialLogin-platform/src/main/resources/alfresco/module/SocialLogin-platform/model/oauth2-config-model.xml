@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<model name="fs:model" xmlns="http://www.alfresco.org/model/dictionary/1.0">
+
+    <imports>
+        <import uri="http://www.alfresco.org/model/dictionary/1.0" prefix="d"/>
+        <import uri="http://www.alfresco.org/model/content/1.0" prefix="cm"/>
+        <import uri="http://www.alfresco.org/model/system/1.0" prefix="sys"/>
+    </imports>
+
+    <namespaces>
+        <namespace uri="http://flex-solution.com/model/analytics/1.0" prefix="fs"/>
+    </namespaces>
+
+    <types>
+        <type name="fs:oauth2-config">
+            <title>Describes project analytics config</title>
+            <parent>cm:content</parent>
+            <mandatory-aspects>
+                <aspect>fs:doNotIndexContentControl</aspect>
+                <aspect>fs:Oauth2LinkedInConfig</aspect>
+                <aspect>sys:hidden</aspect>
+            </mandatory-aspects>
+        </type>
+    </types>
+
+    <aspects>
+        <aspect name="fs:doNotIndexContentControl">
+            <title>Do Not Index Control</title>
+            <parent>cm:indexControl</parent>
+            <overrides>
+                <property name="cm:isIndexed">
+                    <default>false</default>
+                </property>
+                <property name="cm:isContentIndexed">
+                    <default>false</default>
+                </property>
+            </overrides>
+        </aspect>
+
+        <aspect name="fs:Oauth2LinkedInConfig">
+            <properties>
+                <property name="fs:LinkedInOauth2SignInEnabled">
+                    <title>Is LinkedIn Oauth2 Sign In Enabled ?</title>
+                    <type>d:boolean</type>
+                    <default>false</default>
+                </property>
+                <property name="fs:LinkedInClientId">
+                    <title>Client ID</title>
+                    <type>d:text</type>
+                </property>
+                <property name="fs:LinkedInSecretKey">
+                    <title>Secret KEY</title>
+                    <type>d:text</type>
+                </property>
+            </properties>
+        </aspect>
+    </aspects>
+</model>

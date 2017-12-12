@@ -1,0 +1,8 @@
+<webscript>
+    <shortname>List of enabled oauth2 services</shortname>
+    <description>List of enabled oauth2 services</description>
+    <url>/oauth2/enabled-list</url>
+    <authentication>none</authentication>
+    <format default="json"/>
+    <transaction allow="readwrite">required</transaction>
+</webscript>

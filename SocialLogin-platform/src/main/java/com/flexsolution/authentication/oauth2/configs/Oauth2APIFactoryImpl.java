@@ -1,37 +1,46 @@
 package com.flexsolution.authentication.oauth2.configs;
 
 import com.flexsolution.authentication.oauth2.constant.Oauth2Session;
+import com.flexsolution.authentication.oauth2.dto.SocialButton;
 import com.flexsolution.authentication.oauth2.webscript.WebScriptUtils;
-import org.springframework.extensions.webscripts.Status;
-import org.springframework.extensions.webscripts.WebScriptException;
 import org.springframework.extensions.webscripts.WebScriptRequest;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Created by max on 12/7/17 .
  */
 public class Oauth2APIFactoryImpl implements Oauth2APIFactory, Oauth2APIFactoryRegisterInterface {
 
-    private Map<String, Oauth2Configs> registeredAPIs = new HashMap<>();
+    private Map<String, Oauth2Config> registeredAPIs = new HashMap<>();
 
     @Override
-    public Oauth2Configs storeAPIConfigInUserSession(WebScriptRequest req, String api) {
-        Oauth2Configs config = findConfig(api);
+    public Oauth2Config storeAPIConfigInUserSession(WebScriptRequest req, String api) throws Oauth2Exception {
+        Oauth2Config config = findApiConfig(api);
         WebScriptUtils.setSessionAttribute(req, Oauth2Session.API_PROVIDER, api);
         return config;
     }
 
     @Override
-    public Oauth2Configs getAPIFromUserSession(WebScriptRequest req) {
-        return findConfig((String) WebScriptUtils.getSessionAttribute(req, Oauth2Session.API_PROVIDER));
+    public Oauth2Config getAPIFromUserSession(WebScriptRequest req) throws Oauth2Exception {
+        return findApiConfig((String) WebScriptUtils.getSessionAttribute(req, Oauth2Session.API_PROVIDER));
     }
 
-    private Oauth2Configs findConfig(String api) {
+    @Override
+    public Oauth2Config findApiConfig(String api) throws Oauth2Exception {
         return Optional.ofNullable(registeredAPIs.get(api)).orElseThrow(() ->
-                new WebScriptException(Status.STATUS_NOT_FOUND, "api [" + api + "] is not registered"));
+                new Oauth2Exception("api [" + api + "] is not registered"));
+    }
+
+    @Override
+    public List<SocialButton> getAllEnabledServicesNames() {
+        return registeredAPIs.entrySet().stream()
+                .sorted(Comparator.comparing(e -> e.getValue().getApiName()))
+                .filter(a -> a.getValue().isEnabled())
+                .map(api -> api.getValue().getSocialButton())
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
     }
 
     @Override

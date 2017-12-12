@@ -89,11 +89,9 @@ public class SocialSecure extends AbstractWebScript {
                             "<head></head>\n" +
                             "<body>\n" +
                             "<div>Successfully authenticated</div>\n" +
-                            "<div>This window will be automatically closed in 5 sec...</div>\n" +
+                            "<div>This window will be automatically closed</div>\n" +
                             "<script>\n" +
-                            "    window.setInterval(function () {\n" +
-                            "        window.close();\n" +
-                            "    }, 5000);\n" +
+                            "    window.close();\n" +
                             "</script>\n" +
                             "</body>\n" +
                             "</html>");
@@ -112,7 +110,7 @@ public class SocialSecure extends AbstractWebScript {
                     writer.print("<html>\n" +
                             "<head></head>\n" +
                             "<body>\n" +
-                            "<div>" + message + "/div>\n" +
+                            "<div>" + message + "</div>\n" +
                             "<div>This window will be automatically closed in 5 sec...</div>\n" +
                             "<script>\n" +
                             "    window.setInterval(function () {\n" +

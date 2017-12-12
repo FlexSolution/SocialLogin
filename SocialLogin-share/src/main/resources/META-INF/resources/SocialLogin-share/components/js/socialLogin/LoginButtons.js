@@ -43,13 +43,49 @@ var namespace = function (identifier) {
             },
 
             onReady: function Login_onReady() {
-                Alfresco.util.createYUIButton(this, "loginButtons", this.showDialog);
+
+                Alfresco.util.Ajax.request(
+                    {
+                        url: Alfresco.constants.PROXY_URI_RELATIVE.replace("/alfresco/", "/alfresco-noauth/") + "oauth2/enabled-list",
+                        method: Alfresco.util.Ajax.GET,
+                        successCallback: {
+                            fn: function (response, p_obj) {
+                                var list = response.json;
+
+                                console.log(list);
+
+                                for (var i = 0; i < list.length; i++) {
+                                    var socialButton = list[i];
+                                    this.widgets[socialButton.id] = new YAHOO.widget.Button({
+                                        type: "push",
+                                        label: Alfresco.util.message(socialButton.labelKey),
+                                        id: socialButton.id,
+                                        container: this.id,
+                                        onclick: {
+                                            fn: this.showDialog,
+                                            obj: socialButton,
+                                            scope: this
+                                        }
+                                    });
+                                }
+                            },
+                            scope: this
+                        },
+                        failureCallback: {
+                            fn: function (response) {
+                                response = response.serverResponse ? YAHOO.lang.JSON.parse(response.serverResponse.responseText) : response;
+                                console.error(response);
+                                this.showSpinner(response, 10);
+                            },
+                            scope: this
+                        }
+                    });
             },
 
             showDialog: function (p_event, p_obj) {
 
                 var templateUrl = YAHOO.lang.substitute(Alfresco.constants.URL_SERVICECONTEXT + "api/socialLogin/{api}/authorizationUrl", {
-                    api: "linkedIn"//todo other implementations
+                    api: p_obj.id
                 });
 
                 Alfresco.util.Ajax.request(
@@ -59,7 +95,6 @@ var namespace = function (identifier) {
                         successCallback: {
                             fn: function (response, p_obj) {
                                 var url = response.json.authorizationUrl;
-                                // window.open(url, "_self");//todo it is a full screen mode
 
                                 var oauthpopup = function (options) {
                                     options.windowName = options.windowName || 'ConnectWithOAuth'; // should not include space for IE
@@ -90,11 +125,6 @@ var namespace = function (identifier) {
                                 //create new oAuth popup window and monitor it
                                 oauthpopup({
                                     path: url
-                                    // callback: function()
-                                    // {
-                                    //     console.log('callback');
-                                    //     //do callback stuff
-                                    // }
                                 });
                             },
                             scope: this
