@@ -1,4 +1,4 @@
-package com.flexsolution.authentication.oauth2.model;
+package com.flexsolution.authentication.oauth2.dto;
 
 import lombok.Getter;
 import lombok.Setter;

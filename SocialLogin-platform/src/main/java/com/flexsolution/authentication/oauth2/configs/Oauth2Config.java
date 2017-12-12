@@ -1,14 +1,15 @@
 package com.flexsolution.authentication.oauth2.configs;
 
-import com.flexsolution.authentication.oauth2.model.AccessToken;
-import com.flexsolution.authentication.oauth2.model.UserMetadata;
+import com.flexsolution.authentication.oauth2.dto.AccessToken;
+import com.flexsolution.authentication.oauth2.dto.SocialButton;
+import com.flexsolution.authentication.oauth2.dto.UserMetadata;
 
 import java.io.UnsupportedEncodingException;
 
 /**
  * Created by max on 12/6/17 .
  */
-public interface Oauth2Configs {
+public interface Oauth2Config {
 
     String constructFullAuthorizationUrl(String state) throws UnsupportedEncodingException;
 
@@ -19,4 +20,10 @@ public interface Oauth2Configs {
     String getUserNamePrefix();
 
     String getAvatarName();
+
+    boolean isEnabled();
+
+    String getApiName();
+
+    SocialButton getSocialButton();
 }

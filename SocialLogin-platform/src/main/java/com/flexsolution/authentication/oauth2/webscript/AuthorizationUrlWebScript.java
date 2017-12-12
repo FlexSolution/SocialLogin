@@ -1,7 +1,8 @@
 package com.flexsolution.authentication.oauth2.webscript;
 
 import com.flexsolution.authentication.oauth2.configs.Oauth2APIFactory;
-import com.flexsolution.authentication.oauth2.configs.Oauth2Configs;
+import com.flexsolution.authentication.oauth2.configs.Oauth2Config;
+import com.flexsolution.authentication.oauth2.configs.Oauth2Exception;
 import com.flexsolution.authentication.oauth2.constant.Oauth2Session;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -32,13 +33,15 @@ public class AuthorizationUrlWebScript extends DeclarativeWebScript {
         }
 
         try {
-            Oauth2Configs config = oauth2APIFactory.storeAPIConfigInUserSession(req, api);
+            Oauth2Config config = oauth2APIFactory.storeAPIConfigInUserSession(req, api);
             String state = initOauth2StateValue(req);
             HashMap<String, Object> model = new HashMap<>();
             model.put(AUTHORIZATION_URL, config.constructFullAuthorizationUrl(state));
             return model;
         } catch (UnsupportedEncodingException e) {
             throw new WebScriptException(Status.STATUS_INTERNAL_SERVER_ERROR, e.getMessage(), e);
+        } catch (Oauth2Exception e) {
+            throw new WebScriptException(Status.STATUS_NOT_FOUND, e.getMessage(), e);
         }
     }
 

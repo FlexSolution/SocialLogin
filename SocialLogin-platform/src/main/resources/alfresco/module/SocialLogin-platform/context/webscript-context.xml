@@ -12,10 +12,22 @@
         <property name="nodeService" ref="NodeService"/>
         <property name="oauth2APIFactory" ref="oauth2APIFactoryBean"/>
         <property name="contentService" ref="ContentService"/>
+        <property name="authorityService" ref="AuthorityService"/>
+        <property name="namespacePrefixResolver" ref="namespaceService"/>
     </bean>
 
     <bean id="webscript.com.flexsolution.authentication.oauth2.authorizationUrl.get" parent="webscript"
           class="com.flexsolution.authentication.oauth2.webscript.AuthorizationUrlWebScript">
+        <property name="oauth2APIFactory" ref="oauth2APIFactoryBean"/>
+    </bean>
+
+    <bean id="webscript.com.flexsolution.authentication.oauth2.node-config.get" parent="webscript"
+          class="com.flexsolution.authentication.oauth2.webscript.Oauth2ConfigNodeWebScript">
+        <property name="resourceService" ref="resourceService"/>
+    </bean>
+
+    <bean id="webscript.com.flexsolution.authentication.oauth2.enabled-list.get" parent="webscript"
+          class="com.flexsolution.authentication.oauth2.webscript.Oauth2EnabledListWebScript">
         <property name="oauth2APIFactory" ref="oauth2APIFactoryBean"/>
     </bean>
 

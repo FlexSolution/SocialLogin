@@ -18,18 +18,23 @@
 package com.flexsolution.authentication.oauth2.webscript;
 
 import com.flexsolution.authentication.oauth2.configs.Oauth2APIFactory;
-import com.flexsolution.authentication.oauth2.configs.Oauth2Configs;
+import com.flexsolution.authentication.oauth2.configs.Oauth2Config;
+import com.flexsolution.authentication.oauth2.configs.Oauth2Exception;
 import com.flexsolution.authentication.oauth2.constant.Oauth2Parameters;
 import com.flexsolution.authentication.oauth2.constant.Oauth2Session;
 import com.flexsolution.authentication.oauth2.constant.Oauth2Transaction;
-import com.flexsolution.authentication.oauth2.model.AccessToken;
-import com.flexsolution.authentication.oauth2.model.UserMetadata;
+import com.flexsolution.authentication.oauth2.dto.AccessToken;
+import com.flexsolution.authentication.oauth2.dto.UserMetadata;
+import com.flexsolution.authentication.oauth2.util.ImageComparator;
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.content.MimetypeMap;
+import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.repo.transaction.AlfrescoTransactionSupport;
 import org.alfresco.service.cmr.repository.*;
 import org.alfresco.service.cmr.security.AuthenticationService;
+import org.alfresco.service.cmr.security.AuthorityService;
 import org.alfresco.service.cmr.security.PersonService;
+import org.alfresco.service.namespace.NamespacePrefixResolver;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 import org.apache.commons.lang.StringUtils;
@@ -41,10 +46,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
 import java.net.URL;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * A demonstration Java controller for the Hello World Web Script.
@@ -58,12 +60,15 @@ public class SocialSignInWebScript extends DeclarativeWebScript {
 
     private static final String TICKET = "ticket";
     private static final String USER = "user";
+    private static final String EMPTY_STR = "";
 
     private AuthenticationService authenticationService;
     private PersonService personService;
     private NodeService nodeService;
     private Oauth2APIFactory oauth2APIFactory;
     private ContentService contentService;
+    private AuthorityService authorityService;
+    private NamespacePrefixResolver namespacePrefixResolver;
 
     protected Map<String, Object> executeImpl(WebScriptRequest req, Status status, Cache cache) {
 
@@ -89,13 +94,18 @@ public class SocialSignInWebScript extends DeclarativeWebScript {
             throw new WebScriptException(Status.STATUS_UNAUTHORIZED, "'code' is mandatory parameter");
         }
 
-        Oauth2Configs apiConfig = oauth2APIFactory.getAPIFromUserSession(req);
+        Oauth2Config apiConfig;
+        try {
+            apiConfig = oauth2APIFactory.getAPIFromUserSession(req);
+        } catch (Oauth2Exception e) {
+            throw new WebScriptException(Status.STATUS_NOT_FOUND, e.getMessage(), e);
+        }
 
         AccessToken accessToken = apiConfig.getAccessToken(code);
 
         UserMetadata userMetadata = apiConfig.getUserMetadata(accessToken);
 
-        String userName = apiConfig.getUserNamePrefix() + userMetadata.getId();
+        String userName = apiConfig.getUserNamePrefix() + "_" + userMetadata.getId();
 
         AlfrescoTransactionSupport.bindResource(Oauth2Transaction.AUTHENTICATION_USER_NAME, userName);
 
@@ -103,21 +113,50 @@ public class SocialSignInWebScript extends DeclarativeWebScript {
 
         NodeRef personOrNull = personService.getPersonOrNull(userName);
 
+
+        //todo fix stability
+//        Set<String> authorityZones = authorityService.getAuthorityZones(userName);
+//
+//        String zone = AuthorityService.ZONE_AUTH_EXT_PREFIX + "flex_oauth2";
+//        if (!authorityZones.contains(zone)){
+//
+//            Set<String> authorityZonesNew = new HashSet<>();
+//            authorityZonesNew.add(zone);
+//
+//            AuthenticationUtil.runAs(() ->          {
+////                        NodeRef orCreateZone = authorityService.getOrCreateZone(zone);
+//
+//                        authorityService.addAuthorityToZones(userName, authorityZonesNew);
+//                        return null;
+//                    },
+//                    AuthenticationUtil.getAdminUserName());
+//
+//        }
+
         if (personOrNull != null) {
+            // ensure cm:person has 'cm:preferences' aspect applied - as we want to add the avatar as
+            // the child node of the 'cm:preferenceImage' association
+            if (!nodeService.hasAspect(personOrNull, ContentModel.ASPECT_PREFERENCES)) {
+                nodeService.addAspect(personOrNull, ContentModel.ASPECT_PREFERENCES, null);
+            }
+
             nodeService.setProperty(personOrNull, ContentModel.PROP_FIRSTNAME, userMetadata.getFirstName());
             nodeService.setProperty(personOrNull, ContentModel.PROP_LASTNAME, userMetadata.getLastName());
             nodeService.setProperty(personOrNull, ContentModel.PROP_EMAIL, userMetadata.getEmailAddress());
             nodeService.setProperty(personOrNull, ContentModel.PROP_LOCATION, userMetadata.getLocation().getName());
             Optional<String> industry = Optional.ofNullable(userMetadata.getIndustry());
-            Optional<String> headline =  Optional.ofNullable(userMetadata.getHeadline());
+            Optional<String> headline = Optional.ofNullable(userMetadata.getHeadline());
             StringBuilder jobTitle = new StringBuilder();
             industry.ifPresent(jobTitle::append);
-            if(industry.isPresent() && headline.isPresent()) {
+            if (industry.isPresent() && headline.isPresent()) {
                 jobTitle.append(", ");
             }
             headline.ifPresent(jobTitle::append);
             nodeService.setProperty(personOrNull, ContentModel.PROP_JOBTITLE, jobTitle.toString());
-            contentService.getWriter(personOrNull, ContentModel.PROP_PERSONDESC, true).putContent(userMetadata.getSummary());
+
+            String summary = userMetadata.getSummary();
+            Optional.ofNullable(contentService.getWriter(personOrNull, ContentModel.PROP_PERSONDESC, true))
+                    .ifPresent(w -> w.putContent(StringUtils.isNotBlank(summary) ? summary : EMPTY_STR));
 
             updateUserAvatar(personOrNull, userMetadata, apiConfig.getAvatarName());
         } else {
@@ -135,18 +174,25 @@ public class SocialSignInWebScript extends DeclarativeWebScript {
     }
 
 
-    //todo do not overwrite if not changed!
     private void updateUserAvatar(NodeRef personOrNull, UserMetadata userMetadata, String avatarName) {
-        // ensure cm:person has 'cm:preferences' aspect applied - as we want to add the avatar as
-        // the child node of the 'cm:preferenceImage' association
-        if (!nodeService.hasAspect(personOrNull, ContentModel.ASPECT_PREFERENCES)) {
-            nodeService.addAspect(personOrNull, ContentModel.ASPECT_PREFERENCES, null);
-        }
+
         // remove old image child node if we already have one
         List<ChildAssociationRef> childAssoc = nodeService.getChildAssocs(personOrNull,
                 ContentModel.ASSOC_PREFERENCE_IMAGE, null, 1, false);
-        if (!childAssoc.isEmpty()) {
+
+        if (StringUtils.isBlank(userMetadata.getPictureUrl()) && !childAssoc.isEmpty()) {
             nodeService.deleteNode(childAssoc.get(0).getChildRef());
+            logger.debug("Remove avatar if no URL in user metadata");
+            return;
+        }
+
+        if (!childAssoc.isEmpty()) {
+            NodeRef childRef = childAssoc.get(0).getChildRef();
+            if (isAvatarNotChanged(childRef, userMetadata)) {
+                logger.debug("Do not need to update avatar");
+                return;
+            }
+            nodeService.deleteNode(childRef);
         }
 
         Map<QName, Serializable> map = new HashMap<>();
@@ -164,7 +210,8 @@ public class SocialSignInWebScript extends DeclarativeWebScript {
             logger.error("Can not load user logo, ", e);
             e.printStackTrace();// continue here without logo
         }
-//         wire up 'cm:avatar' target association - backward compatible with JSF web-client avatar
+
+        // wire up 'cm:avatar' target association - backward compatible with JSF web-client avatar
         List<ChildAssociationRef> childAssocOldAvatar = nodeService.getChildAssocs(personOrNull,
                 ContentModel.ASSOC_AVATAR, null, 1, false);
         if (!childAssocOldAvatar.isEmpty()) {
@@ -172,6 +219,19 @@ public class SocialSignInWebScript extends DeclarativeWebScript {
         }
 
         nodeService.createAssociation(personOrNull, newImageNodeRef, ContentModel.ASSOC_AVATAR);
+    }
+
+
+    private boolean isAvatarNotChanged(NodeRef childRef, UserMetadata userMetadata) {
+        try (InputStream newIs = new URL(userMetadata.getPictureUrl()).openStream();
+             InputStream existedIs = contentService.getReader(childRef, ContentModel.PROP_CONTENT)
+                     .getContentInputStream()) {
+            return ImageComparator.compare(newIs, existedIs);
+        } catch (IOException e) {
+            logger.error("Can not load user logo, ", e);
+            e.printStackTrace();// continue here without logo
+        }
+        return false;
     }
 
 
@@ -193,5 +253,13 @@ public class SocialSignInWebScript extends DeclarativeWebScript {
 
     public void setContentService(ContentService contentService) {
         this.contentService = contentService;
+    }
+
+    public void setAuthorityService(AuthorityService authorityService) {
+        this.authorityService = authorityService;
+    }
+
+    public void setNamespacePrefixResolver(NamespacePrefixResolver namespacePrefixResolver) {
+        this.namespacePrefixResolver = namespacePrefixResolver;
     }
 }

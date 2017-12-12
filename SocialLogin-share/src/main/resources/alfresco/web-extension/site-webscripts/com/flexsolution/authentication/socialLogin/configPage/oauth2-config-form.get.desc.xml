@@ -1,0 +1,6 @@
+<webscript>
+  <shortname>Oauth2 config Form Component</shortname>
+  <description>Component that renders a form based Oauth2 config on a repository form model</description>
+  <url>/components/oauth2-config-form</url>
+  <family>admin-console</family>
+</webscript>

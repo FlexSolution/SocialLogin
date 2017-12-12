@@ -1,0 +1,8 @@
+<webscript>
+    <shortname>Get oauth2 config node</shortname>
+    <description>Return oauth2 config nodeRef</description>
+    <url>/oauth2/config-node</url>
+    <format default="json">argument</format>
+    <authentication>admin</authentication>
+    <transaction>required</transaction>
+</webscript>

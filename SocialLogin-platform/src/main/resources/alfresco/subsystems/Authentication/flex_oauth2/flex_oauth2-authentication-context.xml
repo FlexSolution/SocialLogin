@@ -8,8 +8,7 @@
     <bean id="authenticationComponent"
           class="com.flexsolution.authentication.oauth2.authentication.Oauth2AuthenticationComponentImpl"
           parent="authenticationComponentBase">
-        <!--<property name="authenticationDao" ref="authenticationDao"/>-->
-        <property name="enabled" value="${flex_oauth2.authentication.enabled:false}"/>
+        <property name="oauth2APIFactory" ref="oauth2APIFactoryBean"/>
         <property name="nodeService" ref="nodeService"/>
         <property name="personService" ref="personService"/>
         <property name="transactionService" ref="transactionService"/>
@@ -57,5 +56,9 @@
         <!--<property name="authenticationCache" ref="authenticationCache"/>-->
         <!--<property name="singletonCache" ref="immutableSingletonCache"/>-->
         <!--<property name="transactionService" ref="transactionService"/>-->
+    <!--</bean>-->
+
+    <!--todo fix stability-->
+    <!--<bean id="userRegistry" class="com.flexsolution.authentication.oauth2.authentication.Oauth2UserRegistry">-->
     <!--</bean>-->
 </beans>
