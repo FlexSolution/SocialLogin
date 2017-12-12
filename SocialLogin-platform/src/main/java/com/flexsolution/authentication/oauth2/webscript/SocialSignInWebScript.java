@@ -25,6 +25,7 @@ import com.flexsolution.authentication.oauth2.constant.Oauth2Session;
 import com.flexsolution.authentication.oauth2.constant.Oauth2Transaction;
 import com.flexsolution.authentication.oauth2.dto.AccessToken;
 import com.flexsolution.authentication.oauth2.dto.UserMetadata;
+import com.flexsolution.authentication.oauth2.util.ImageComparator;
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.content.MimetypeMap;
 import org.alfresco.repo.transaction.AlfrescoTransactionSupport;
@@ -59,6 +60,7 @@ public class SocialSignInWebScript extends DeclarativeWebScript {
 
     private static final String TICKET = "ticket";
     private static final String USER = "user";
+    private static final String EMPTY_STR = "";
 
     private AuthenticationService authenticationService;
     private PersonService personService;
@@ -129,9 +131,10 @@ public class SocialSignInWebScript extends DeclarativeWebScript {
             }
             headline.ifPresent(jobTitle::append);
             nodeService.setProperty(personOrNull, ContentModel.PROP_JOBTITLE, jobTitle.toString());
-            Optional.ofNullable(userMetadata.getSummary()).ifPresent(s ->
-                    Optional.ofNullable(contentService.getWriter(personOrNull, ContentModel.PROP_PERSONDESC, true))
-                            .ifPresent(w -> w.putContent(s)));
+
+            String summary = userMetadata.getSummary();
+            Optional.ofNullable(contentService.getWriter(personOrNull, ContentModel.PROP_PERSONDESC, true))
+                    .ifPresent(w -> w.putContent(StringUtils.isNotBlank(summary) ? summary : EMPTY_STR));
 
             updateUserAvatar(personOrNull, userMetadata, apiConfig.getAvatarName());
         } else {
@@ -149,14 +152,25 @@ public class SocialSignInWebScript extends DeclarativeWebScript {
     }
 
 
-    //todo do not overwrite if not changed!
     private void updateUserAvatar(NodeRef personOrNull, UserMetadata userMetadata, String avatarName) {
 
         // remove old image child node if we already have one
         List<ChildAssociationRef> childAssoc = nodeService.getChildAssocs(personOrNull,
                 ContentModel.ASSOC_PREFERENCE_IMAGE, null, 1, false);
-        if (!childAssoc.isEmpty()) {
+
+        if (StringUtils.isBlank(userMetadata.getPictureUrl()) && !childAssoc.isEmpty()) {
             nodeService.deleteNode(childAssoc.get(0).getChildRef());
+            logger.debug("Remove avatar if no URL in user metadata");
+            return;
+        }
+
+        if (!childAssoc.isEmpty()) {
+            NodeRef childRef = childAssoc.get(0).getChildRef();
+            if (isAvatarNotChanged(childRef, userMetadata)) {
+                logger.debug("Do not need to update avatar");
+                return;
+            }
+            nodeService.deleteNode(childRef);
         }
 
         Map<QName, Serializable> map = new HashMap<>();
@@ -174,7 +188,8 @@ public class SocialSignInWebScript extends DeclarativeWebScript {
             logger.error("Can not load user logo, ", e);
             e.printStackTrace();// continue here without logo
         }
-//         wire up 'cm:avatar' target association - backward compatible with JSF web-client avatar
+
+        // wire up 'cm:avatar' target association - backward compatible with JSF web-client avatar
         List<ChildAssociationRef> childAssocOldAvatar = nodeService.getChildAssocs(personOrNull,
                 ContentModel.ASSOC_AVATAR, null, 1, false);
         if (!childAssocOldAvatar.isEmpty()) {
@@ -182,6 +197,19 @@ public class SocialSignInWebScript extends DeclarativeWebScript {
         }
 
         nodeService.createAssociation(personOrNull, newImageNodeRef, ContentModel.ASSOC_AVATAR);
+    }
+
+
+    private boolean isAvatarNotChanged(NodeRef childRef, UserMetadata userMetadata) {
+        try (InputStream newIs = new URL(userMetadata.getPictureUrl()).openStream();
+             InputStream existedIs = contentService.getReader(childRef, ContentModel.PROP_CONTENT)
+                     .getContentInputStream()) {
+            return ImageComparator.compare(newIs, existedIs);
+        } catch (IOException e) {
+            logger.error("Can not load user logo, ", e);
+            e.printStackTrace();// continue here without logo
+        }
+        return false;
     }
 
 
