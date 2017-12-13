@@ -58,7 +58,5 @@
         <!--<property name="transactionService" ref="transactionService"/>-->
     <!--</bean>-->
 
-    <!--todo fix stability-->
-    <!--<bean id="userRegistry" class="com.flexsolution.authentication.oauth2.authentication.Oauth2UserRegistry">-->
-    <!--</bean>-->
+    <bean id="userRegistry" class="com.flexsolution.authentication.oauth2.authentication.Oauth2UserRegistry"/>
 </beans>
