@@ -6,17 +6,7 @@ var main = function(){
 
             Alfresco.util.PopupManager.displayPrompt({
                 title: "Success",
-                text: "Oauth2 configuration has been saved",
-                buttons: [
-                    {
-                        text: "Ok",
-                        isDefault: true,
-                        handler: function () {
-                            this.hide();
-                            window.location.reload(true);
-                        }
-                    }
-                ]
+                text: "Oauth2 configuration has been saved"
             });
         };
 

@@ -50,7 +50,6 @@ public class Oauth2ConfigFormWebScript extends FormUIGet {
             model = generateModel(NODE, itemId, req, status, cache);
             Map<String, Object> modelForm = (Map<String, Object>) model.get(MODEL_FORM);
             modelForm.put(MODEL_ENCTYPE, ENCTYPE_JSON);
-            modelForm.put(MODEL_SHOW_RESET_BUTTON, true);
         } else {
             model = new HashMap<>(1);
             model.put(MODEL_FORM, null);
