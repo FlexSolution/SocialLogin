@@ -1,8 +1,5 @@
 package com.flexsolution.authentication.oauth2.configs;
 
-/**
- * Created by max on 3/1/16
- */
 public class Oauth2Exception extends Exception {
 
     public Oauth2Exception(String message) {

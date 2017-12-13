@@ -13,7 +13,6 @@
         <property name="oauth2APIFactory" ref="oauth2APIFactoryBean"/>
         <property name="contentService" ref="ContentService"/>
         <property name="authorityService" ref="AuthorityService"/>
-        <property name="namespacePrefixResolver" ref="namespaceService"/>
     </bean>
 
     <bean id="webscript.com.flexsolution.authentication.oauth2.authorizationUrl.get" parent="webscript"

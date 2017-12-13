@@ -3,9 +3,6 @@ package com.flexsolution.authentication.oauth2.configs;
 import com.flexsolution.authentication.oauth2.model.Oauth2ConfigModel;
 import org.alfresco.service.namespace.QName;
 
-/**
- * Created by max on 12/6/17 .
- */
 public class LinkedInOauth2Configs extends AbstractOauth2Configs {
 
     private static final String LINKED_IN = "linkedIn";

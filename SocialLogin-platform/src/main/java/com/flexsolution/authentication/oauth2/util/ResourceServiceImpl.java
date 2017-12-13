@@ -15,9 +15,6 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.NoSuchElementException;
 
-/**
- * Created by max on 11/14/17 .
- */
 public class ResourceServiceImpl implements ResourceService {
 
     private static final Logger logger = Logger.getLogger(ResourceServiceImpl.class);

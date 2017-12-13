@@ -13,7 +13,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Created by max on 12/6/17 .
+ * WebScript that returns a full URL for Oauth2 Authorization by api short name.
+ * Included state parameter for preventing CSRF attacks
  */
 public class AuthorizationUrlWebScript extends DeclarativeWebScript {
 

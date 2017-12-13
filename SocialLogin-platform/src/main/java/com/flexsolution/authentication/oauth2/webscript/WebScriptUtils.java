@@ -3,9 +3,7 @@ package com.flexsolution.authentication.oauth2.webscript;
 import org.springframework.extensions.webscripts.WebScriptRequest;
 import org.springframework.extensions.webscripts.servlet.WebScriptServletRuntime;
 
-/**
- * Created by max on 12/7/17 .
- */
+
 public final class WebScriptUtils {
 
     public static void setSessionAttribute(WebScriptRequest req, String key, Object value) {

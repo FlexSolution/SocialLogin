@@ -40,9 +40,7 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by max on 12/6/17 .
- */
+
 public abstract class AbstractOauth2Configs implements Oauth2Config {
 
     public static final String OAUTH2_CONFIG_NODE_PATH = "Data Dictionary/fs.oauth2.config";
@@ -153,7 +151,7 @@ public abstract class AbstractOauth2Configs implements Oauth2Config {
                     return gson.fromJson(responseString, UserMetadata.class);
 
                 } else {
-                    throw new WebScriptException(Status.STATUS_UNAUTHORIZED, entity.toString());//todo test
+                    throw new WebScriptException(Status.STATUS_UNAUTHORIZED, entity.toString());
                 }
             }
         } catch (IOException e) {
@@ -167,7 +165,7 @@ public abstract class AbstractOauth2Configs implements Oauth2Config {
                         Boolean.TRUE.equals(nodeService.getProperty(getOauth2ConfigFile(), getQNameForEnableField())),
                 AuthenticationUtil.getAdminUserName());
     }
-    
+
     @Override
     public SocialButton getSocialButton() {
         return new SocialButton(getApiName(), labelKey);

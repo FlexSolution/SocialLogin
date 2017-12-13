@@ -8,7 +8,6 @@
           class="com.flexsolution.authentication.oauth2.webscript.SocialSecure"
           parent="webscript">
         <property name="connectorService" ref="connector.service"/>
-        <property name="userFactory" ref="user.factory"/>
         <property name="webFrameworkConfiguration" ref="webframework.config.element"/>
     </bean>
 
@@ -28,8 +27,9 @@
         </property>
     </bean>
 
-    <bean id="webscript.com.flexsolution.authentication.socialLogin.configPage.oauth2-config-form.get" class="com.flexsolution.authentication.oauth2.form.Oauth2ConfigFormWebScript" parent="webscript">
-        <property name="configService" ref="web.config" />
+    <bean id="webscript.com.flexsolution.authentication.socialLogin.configPage.oauth2-config-form.get"
+          class="com.flexsolution.authentication.oauth2.form.Oauth2ConfigFormWebScript" parent="webscript">
+        <property name="configService" ref="web.config"/>
         <property name="connectorService" ref="connector.service"/>
     </bean>
 

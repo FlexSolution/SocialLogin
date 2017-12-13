@@ -9,7 +9,7 @@ import org.alfresco.service.namespace.QName;
 import java.util.*;
 
 /**
- * Created by max on 12/12/17 .
+ * Registry bean for returning a list of blocked field for user profile
  */
 public class Oauth2UserRegistry implements UserRegistry, ActivateableBean {
 

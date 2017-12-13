@@ -1,4 +1,1 @@
-{
-"ticket":"${ticket}",
-"user":"${user}"
-}
+{"ticket":"${ticket}","user":"${user}"}
