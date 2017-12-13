@@ -47,8 +47,12 @@ public class Oauth2AuthenticationComponentImpl extends AbstractAuthenticationCom
 
     public void authenticateImpl(String userName, char[] password) throws AuthenticationException {
 
+        int indexOf = userName.indexOf("_");
+        if (indexOf == -1) {
+            throw new AuthenticationException("Access Denied");
+        }
         try {
-            String apiName = userName.substring(0, userName.indexOf("_"));
+            String apiName = userName.substring(0, indexOf);
             Oauth2Config apiConfig = oauth2APIFactory.findApiConfig(apiName);
 
             if (apiConfig.isEnabled() && userName.equals(AlfrescoTransactionSupport.getResource(Oauth2Transaction.AUTHENTICATION_USER_NAME)) &&

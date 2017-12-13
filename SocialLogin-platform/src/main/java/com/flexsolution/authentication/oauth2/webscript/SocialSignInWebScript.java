@@ -114,24 +114,23 @@ public class SocialSignInWebScript extends DeclarativeWebScript {
         NodeRef personOrNull = personService.getPersonOrNull(userName);
 
 
-        //todo fix stability
-//        Set<String> authorityZones = authorityService.getAuthorityZones(userName);
-//
-//        String zone = AuthorityService.ZONE_AUTH_EXT_PREFIX + "flex_oauth2";
-//        if (!authorityZones.contains(zone)){
-//
-//            Set<String> authorityZonesNew = new HashSet<>();
-//            authorityZonesNew.add(zone);
-//
-//            AuthenticationUtil.runAs(() ->          {
-////                        NodeRef orCreateZone = authorityService.getOrCreateZone(zone);
-//
-//                        authorityService.addAuthorityToZones(userName, authorityZonesNew);
-//                        return null;
-//                    },
-//                    AuthenticationUtil.getAdminUserName());
-//
-//        }
+        Set<String> authorityZones = authorityService.getAuthorityZones(userName);
+
+        String zone = AuthorityService.ZONE_AUTH_EXT_PREFIX + "flex_oauth2";
+        if (!authorityZones.contains(zone)){
+
+            Set<String> authorityZonesNew = new HashSet<>();
+            authorityZonesNew.add(zone);
+
+            AuthenticationUtil.runAs(() ->          {
+//                        NodeRef orCreateZone = authorityService.getOrCreateZone(zone);
+
+                        authorityService.addAuthorityToZones(userName, authorityZonesNew);
+                        return null;
+                    },
+                    AuthenticationUtil.getAdminUserName());
+
+        }
 
         if (personOrNull != null) {
             // ensure cm:person has 'cm:preferences' aspect applied - as we want to add the avatar as
