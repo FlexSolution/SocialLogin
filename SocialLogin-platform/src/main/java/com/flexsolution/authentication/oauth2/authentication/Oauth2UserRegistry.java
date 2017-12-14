@@ -21,7 +21,7 @@ public class Oauth2UserRegistry implements UserRegistry, ActivateableBean {
         Q_NAMES.add(ContentModel.PROP_EMAIL);
         Q_NAMES.add(ContentModel.PROP_LOCATION);
         Q_NAMES.add(ContentModel.PROP_JOBTITLE);
-        Q_NAMES.add(ContentModel.PROP_PERSONDESC);//todo text area doesn't block and avatar too
+//        Q_NAMES.add(ContentModel.PROP_PERSONDESC);//todo this field is text area and doesn't block by Share UI and avatar too
     }
 
     @Override

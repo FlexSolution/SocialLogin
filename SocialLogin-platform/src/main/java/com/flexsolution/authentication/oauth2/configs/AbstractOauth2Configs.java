@@ -116,7 +116,7 @@ public abstract class AbstractOauth2Configs implements Oauth2Config {
                     return gson.fromJson(responseString, AccessToken.class);
 
                 } else {
-                    throw new WebScriptException(Status.STATUS_UNAUTHORIZED, entity.toString());//todo test
+                    throw new WebScriptException(Status.STATUS_UNAUTHORIZED, entity.toString());
                 }
             }
 

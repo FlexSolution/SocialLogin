@@ -105,21 +105,28 @@ var namespace = function (identifier) {
                                     var that = this;
                                     console.log(options.path);
                                     that._oauthWindow = window.open(options.path, options.windowName, options.windowOptions);
-                                    that._oauthInterval = window.setInterval(function () {
+                                    if (that._oauthWindow) {
+                                        that._oauthInterval = window.setInterval(function () {
 
-                                        if (that._oauthWindow.closed) {
+                                            if (that._oauthWindow.closed) {
+                                                window.clearInterval(that._oauthInterval);
+                                                options.callback();
+                                            }
+                                        }, 1000);
+
+                                        YAHOO.util.Event.addListener(window, 'beforeunload', function () {
+                                            if (!that._oauthWindow.closed) that._oauthWindow.close();
+                                        });
+
+                                        YAHOO.util.Event.addListener(that._oauthWindow, 'beforeunload', function () {
                                             window.clearInterval(that._oauthInterval);
-                                            options.callback();
-                                        }
-                                    }, 1000);
-
-                                    YAHOO.util.Event.addListener(window, 'beforeunload', function () {
-                                        if (!that._oauthWindow.closed) that._oauthInterval.close();
-                                    });
-
-                                    YAHOO.util.Event.addListener(that._oauthInterval, 'beforeunload', function () {
-                                        window.clearInterval(that._oauthInterval);
-                                    });
+                                        });
+                                    } else {
+                                        Alfresco.util.PopupManager.displayPrompt({
+                                            title: "Warning",
+                                            text: "Please allow popup windows in your browser for Oauth2 Signing in"
+                                        });
+                                    }
                                 };
 
                                 //create new oAuth popup window and monitor it

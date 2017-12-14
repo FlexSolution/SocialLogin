@@ -106,7 +106,7 @@ public class SocialSecure extends AbstractWebScript {
                             "<body>\n" +
                             "<div>" + message + "</div>\n" +
                             "<div>If this window was not closed automatically in 5 sec...,\n" +
-                            "    please close it manually and reload the main login page too<</div>\n" +
+                            "    please close it manually and reload the main login page too</div>\n" +
                             "<script>\n" +
                             "    window.setInterval(function () {\n" +
                             "        window.close();\n" +
