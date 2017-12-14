@@ -10,7 +10,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Created by max on 12/6/17 .
+ * return NodeRef of Oauth2 config for admin users
  */
 public class Oauth2ConfigNodeWebScript extends DeclarativeWebScript {
 

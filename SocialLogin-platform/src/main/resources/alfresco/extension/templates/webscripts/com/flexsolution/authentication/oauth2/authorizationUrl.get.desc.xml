@@ -1,6 +1,6 @@
 <webscript>
-    <shortname>socialLogin authorizationUrl</shortname>
-    <description>socialLogin authorizationUrl</description>
+    <shortname>Get Authorization Url for Oauth2 provider</shortname>
+    <description>returns socialLogin authorizationUrl</description>
     <url>/socialLogin/{api}/authorizationUrl</url>
     <authentication>none</authentication>
     <format default="json"/>

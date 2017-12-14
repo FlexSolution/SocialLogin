@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Created by max on 12/6/17 .
+ * Return the list of enabled Oauth2 providers
  */
 public class Oauth2EnabledListWebScript extends DeclarativeWebScript {
 

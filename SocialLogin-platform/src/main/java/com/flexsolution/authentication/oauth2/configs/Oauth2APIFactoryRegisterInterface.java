@@ -1,15 +1,15 @@
 package com.flexsolution.authentication.oauth2.configs;
 
 /**
- * Created by max on 12/7/17 .
+ * interface for auto registration Oauth2Configs by api short name
  */
 public interface Oauth2APIFactoryRegisterInterface {
 
     /**
-     * autowired by spring
+     * autowired by spring (do not use it manually)
      *
-     * @param name           api string name for provider
+     * @param api            api short name for provider
      * @param registeredAPIs bean implementation
      */
-    void registerAPI(AbstractOauth2Configs registeredAPIs, String name);
+    void registerAPI(AbstractOauth2Configs registeredAPIs, String api);
 }

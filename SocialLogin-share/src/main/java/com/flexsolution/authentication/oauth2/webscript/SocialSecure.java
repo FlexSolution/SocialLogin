@@ -36,7 +36,6 @@ public class SocialSecure extends AbstractWebScript {
     private static final Logger logger = LogManager.getLogger(SocialSecure.class);
 
     private ConnectorService connectorService;
-    private UserFactory userFactory;
     private WebFrameworkConfigElement webFrameworkConfiguration;
 
     @Override
@@ -77,19 +76,14 @@ public class SocialSecure extends AbstractWebScript {
                 connectorSession.setParameter(AlfrescoAuthenticator.CS_PARAM_ALF_TICKET, ticket);
                 connectorSession.setParameter(UserFactory.SESSION_ATTRIBUTE_EXTERNAL_AUTH, Boolean.TRUE.toString());
 
-//                servletResponse.setStatus(Status.STATUS_FOUND);
-//                servletResponse.sendRedirect(req.getContextPath() +
-//                        ((SlingshotUserFactory) userFactory).getUserHomePage(ThreadLocalRequestContext.getRequestContext(),
-//                                user));
-
-
                 servletResponse.setStatus(Status.STATUS_OK);
-                try (PrintWriter writer = servletResponse.getWriter()) { //print error message for user
+                try (PrintWriter writer = servletResponse.getWriter()) { //print auto closing page for user
                     writer.print("<html>\n" +
                             "<head></head>\n" +
                             "<body>\n" +
                             "<div>Successfully authenticated</div>\n" +
-                            "<div>This window will be automatically closed</div>\n" +
+                            "<div>If this window was not closed automatically,\n" +
+                            "    please close it manually and reload the main login page too</div>\n" +
                             "<script>\n" +
                             "    window.close();\n" +
                             "</script>\n" +
@@ -111,7 +105,8 @@ public class SocialSecure extends AbstractWebScript {
                             "<head></head>\n" +
                             "<body>\n" +
                             "<div>" + message + "</div>\n" +
-                            "<div>This window will be automatically closed in 5 sec...</div>\n" +
+                            "<div>If this window was not closed automatically in 5 sec...,\n" +
+                            "    please close it manually and reload the main login page too</div>\n" +
                             "<script>\n" +
                             "    window.setInterval(function () {\n" +
                             "        window.close();\n" +
@@ -138,9 +133,6 @@ public class SocialSecure extends AbstractWebScript {
         } catch (JSONException e) {
             logger.error("Could not parse response into json object", e);
             servletResponse.sendError(Status.STATUS_INTERNAL_SERVER_ERROR, e.getMessage());
-//        } catch (UserFactoryException e) {
-//            logger.error("Could not load user home page", e);
-//            servletResponse.sendError(Status.STATUS_INTERNAL_SERVER_ERROR, e.getMessage());
         } catch (CredentialVaultProviderException e) {
             logger.error("Could not load user Credential Vault", e);
             servletResponse.sendError(Status.STATUS_INTERNAL_SERVER_ERROR, e.getMessage());
@@ -161,10 +153,6 @@ public class SocialSecure extends AbstractWebScript {
      */
     public void setConnectorService(ConnectorService connectorService) {
         this.connectorService = connectorService;
-    }
-
-    public void setUserFactory(UserFactory userFactory) {
-        this.userFactory = userFactory;
     }
 
     public void setWebFrameworkConfiguration(WebFrameworkConfigElement webFrameworkConfiguration) {

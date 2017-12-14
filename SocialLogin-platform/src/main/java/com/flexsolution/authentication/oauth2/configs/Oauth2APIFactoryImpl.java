@@ -8,9 +8,6 @@ import org.springframework.extensions.webscripts.WebScriptRequest;
 import java.util.*;
 import java.util.stream.Collectors;
 
-/**
- * Created by max on 12/7/17 .
- */
 public class Oauth2APIFactoryImpl implements Oauth2APIFactory, Oauth2APIFactoryRegisterInterface {
 
     private Map<String, Oauth2Config> registeredAPIs = new HashMap<>();
@@ -44,7 +41,7 @@ public class Oauth2APIFactoryImpl implements Oauth2APIFactory, Oauth2APIFactoryR
     }
 
     @Override
-    public void registerAPI(AbstractOauth2Configs registeredAPIs, String name) {
-        this.registeredAPIs.put(name, registeredAPIs);
+    public void registerAPI(AbstractOauth2Configs registeredAPIs, String api) {
+        this.registeredAPIs.put(api, registeredAPIs);
     }
 }

@@ -19,11 +19,17 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Created by max on 11/24/17 .
+ * Proxy authorization endpoint that will be called by Oauth2 provider after succeed allowing access.
+ * Authenticate user in Share after receiving an Alfresco Ticket from Alfresco repository
  */
 public class AuthenticationURLProxy extends DeclarativeWebScript {
 
     private static final Logger logger = LogManager.getLogger(AuthenticationURLProxy.class);
+
+    private static final String AUTHORIZATION_URL = "authorizationUrl";
+    private static final String STATUS = "status";
+    private static final String DESCRIPTION = "description";
+    private static final String API = "api";
 
     private ConnectorService connectorService;
 
@@ -32,7 +38,7 @@ public class AuthenticationURLProxy extends DeclarativeWebScript {
 
         Map<String, String> templateVars = req.getServiceMatch().getTemplateVars();
 
-        String api = templateVars.get("api");
+        String api = templateVars.get(API);
 
         if (StringUtils.isBlank(api)) {
             throw new WebScriptException(Status.STATUS_BAD_REQUEST, "'api' is missing");
@@ -49,13 +55,13 @@ public class AuthenticationURLProxy extends DeclarativeWebScript {
 
             if (call.getStatus().getCode() == Status.STATUS_OK) {
                 Map<String, Object> model = new HashMap<>();
-                model.put("authorizationUrl", new JSONObject(call.getText()).getString("authorizationUrl"));
+                model.put(AUTHORIZATION_URL, new JSONObject(call.getText()).getString(AUTHORIZATION_URL));
                 return model;
 
             } else {
                 // receive description of the error
                 JSONObject jsonErrObject = new JSONObject(call.getText());
-                String errMessage = (String) ((JSONObject) jsonErrObject.get("status")).get("description");
+                String errMessage = (String) ((JSONObject) jsonErrObject.get(STATUS)).get(DESCRIPTION);
                 throw new WebScriptException(Status.STATUS_BAD_REQUEST, errMessage);
             }
         } catch (ConnectorServiceException | JSONException e) {

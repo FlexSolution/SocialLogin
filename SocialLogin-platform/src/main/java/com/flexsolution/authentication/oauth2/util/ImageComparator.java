@@ -8,10 +8,16 @@ import java.io.InputStream;
 import java.util.Arrays;
 
 /**
- * Created by max on 12/12/17 .
+ * comparator for images. Pixes by pixel
  */
 public class ImageComparator {
 
+    /**
+     * @param is1 image1
+     * @param is2 image2
+     * @return true if images are the same
+     * @throws IOException if an error occurs during reading
+     */
     public static boolean compare(InputStream is1, InputStream is2) throws IOException {
         try {
             BufferedImage image1 = ImageIO.read(is1);

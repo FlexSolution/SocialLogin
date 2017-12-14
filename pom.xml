@@ -70,12 +70,6 @@
             <version>1.9.5</version>
             <scope>test</scope>
         </dependency>
-        <!--<dependency>-->
-            <!--<groupId>org.apache.httpcomponents</groupId>-->
-            <!--<artifactId>httpclient</artifactId>-->
-            <!--<version>4.5.2</version>-->
-            <!--<scope>test</scope>-->
-        <!--</dependency>-->
 
         <!-- The main Alfresco Repo dependency for compiling Java code in src/main/java -->
         <dependency>
@@ -206,7 +200,7 @@
                     the layout of your AMP. The end result is that Maven will produce both a JAR file and an AMP with your
                     module.
                 -->
-                <!--
+
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-assembly-plugin</artifactId>
@@ -232,7 +226,7 @@
                         </dependency>
                     </dependencies>
                 </plugin>
-                -->
+
 
                 <!-- Filter resources in any sub-project with this config -->
                 <plugin>

@@ -39,6 +39,7 @@ import java.util.stream.Stream;
 
 public class Oauth2AuthenticationComponentImpl extends AbstractAuthenticationComponent {
 
+    private static final String ACCESS_DENIED = "Access Denied";
     private Oauth2APIFactory oauth2APIFactory;
 
     public Oauth2AuthenticationComponentImpl() {
@@ -47,8 +48,12 @@ public class Oauth2AuthenticationComponentImpl extends AbstractAuthenticationCom
 
     public void authenticateImpl(String userName, char[] password) throws AuthenticationException {
 
+        int indexOf = userName.indexOf("_");
+        if (indexOf == -1) {
+            throw new AuthenticationException(ACCESS_DENIED);
+        }
         try {
-            String apiName = userName.substring(0, userName.indexOf("_"));
+            String apiName = userName.substring(0, indexOf);
             Oauth2Config apiConfig = oauth2APIFactory.findApiConfig(apiName);
 
             if (apiConfig.isEnabled() && userName.equals(AlfrescoTransactionSupport.getResource(Oauth2Transaction.AUTHENTICATION_USER_NAME)) &&
@@ -57,10 +62,10 @@ public class Oauth2AuthenticationComponentImpl extends AbstractAuthenticationCom
                             SocialSignInWebScript.class.getName().equals(s.getClassName()))) {
                 setCurrentUser(userName);
             } else {
-                throw new AuthenticationException("Access Denied");
+                throw new AuthenticationException(ACCESS_DENIED);
             }
         } catch (Oauth2Exception e) {
-            throw new AuthenticationException("Access Denied");
+            throw new AuthenticationException(ACCESS_DENIED);
         }
     }
 

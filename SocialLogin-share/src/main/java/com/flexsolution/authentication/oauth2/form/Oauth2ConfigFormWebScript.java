@@ -1,5 +1,6 @@
 package com.flexsolution.authentication.oauth2.form;
 
+import org.alfresco.repo.content.MimetypeMap;
 import org.alfresco.web.scripts.forms.FormUIGet;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -18,12 +19,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Created by max on 1/27/16.
+ * proxy for getting NodeRef of Oauth2 config for admin users
  */
 public class Oauth2ConfigFormWebScript extends FormUIGet {
 
     private static final String NODE_REF = "nodeRef";
     private static final String NODE = "node";
+    private static final String URI = "/oauth2/config-node";
 
     private ConnectorService connectorService;
 
@@ -44,13 +46,11 @@ public class Oauth2ConfigFormWebScript extends FormUIGet {
 
         Map<String, Object> model;
 
-        /** Replaced parameter! */
-
+        /* Replaced parameter! */
         if (itemId != null && itemId.length() > 0) {
             model = generateModel(NODE, itemId, req, status, cache);
             Map<String, Object> modelForm = (Map<String, Object>) model.get(MODEL_FORM);
             modelForm.put(MODEL_ENCTYPE, ENCTYPE_JSON);
-            modelForm.put(MODEL_SHOW_RESET_BUTTON, true);
         } else {
             model = new HashMap<>(1);
             model.put(MODEL_FORM, null);
@@ -69,10 +69,10 @@ public class Oauth2ConfigFormWebScript extends FormUIGet {
             Connector connector = connectorService.getConnector(ENDPOINT_ID, currentUserId, currentSession);
 
             ConnectorContext context = new ConnectorContext(HttpMethod.GET);
-            context.setContentType("application/json");
+            context.setContentType(MimetypeMap.MIMETYPE_JSON);
 
             // call the form service
-            Response response = connector.call("/oauth2/config-node", context);
+            Response response = connector.call(URI, context);
 
             int code = response.getStatus().getCode();
 
