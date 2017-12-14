@@ -59,4 +59,4 @@ Examples: `https://192.168.0.119:8443/share/service/api/social-login`, `https://
 * Fill `Client ID` and `Secret KEY` from your LinkedIn application that you have already created. Set checkbox `Is LinkedIn Oauth2 Sign In Enabled ?` for enabling `Sign In with LinkedIn` button on the login page. Click `Submit`.
 
 * Done. You can open login page an sing into Alfresco Share as a LinkedIn user.
-
+![Sample Video](https://ecm.flex-solution.com/share/proxy/alfresco/slingshot/node/content/workspace/SpacesStore/af4cffb5-5c4e-4b18-a810-b01237a7adb4/LinkedIn%20integration%20v4.mp4)
