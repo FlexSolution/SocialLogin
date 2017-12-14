@@ -118,9 +118,6 @@ var namespace = function (identifier) {
                                             if (!that._oauthWindow.closed) that._oauthWindow.close();
                                         });
 
-                                        YAHOO.util.Event.addListener(that._oauthWindow, 'beforeunload', function () {
-                                            window.clearInterval(that._oauthInterval);
-                                        });
                                     } else {
                                         Alfresco.util.PopupManager.displayPrompt({
                                             title: "Warning",
