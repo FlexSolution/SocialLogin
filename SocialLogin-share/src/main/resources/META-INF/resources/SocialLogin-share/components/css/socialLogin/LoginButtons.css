@@ -1,3 +1,11 @@
+/* abstract styles */
+.social-login-button > span.yui-button > .first-child > button:before {
+    font: normal normal normal 14px/1 FontAwesome;
+    font-size: 2em;
+    padding-right: 5px;
+}
+
+/* ==== LinkedIn ===== */
 .social-login-button > #linkedIn > .first-child > button {
     background-color: #0077b5;
     border-color: #0077b5;
@@ -8,11 +16,7 @@
 }
 
 .social-login-button > #linkedIn > .first-child > button:before {
-    content: "\f08c";
+    content: "\f08c"; /* font awesome linkedIn icon */
 }
 
-.social-login-button > span.yui-button > .first-child > button:before {
-    font: normal normal normal 14px/1 FontAwesome;
-    font-size: 2em;
-    padding-right: 5px;
-}
+/* =================== */

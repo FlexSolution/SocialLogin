@@ -5,5 +5,4 @@
     <authentication>none</authentication>
     <format default="json"/>
     <transaction allow="readwrite">required</transaction>
-    <!--<lifecycle>sample</lifecycle>    -->
 </webscript>

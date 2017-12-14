@@ -3,8 +3,6 @@
        xmlns="http://www.springframework.org/schema/beans"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-
-
     <bean id="authenticationComponent"
           class="com.flexsolution.authentication.oauth2.authentication.Oauth2AuthenticationComponentImpl"
           parent="authenticationComponentBase">
@@ -43,20 +41,6 @@
         <property name="protectionPeriodSeconds" value="${authentication.protection.periodSeconds}"/>
         <property name="personService" ref="PersonService"/>
     </bean>
-
-    <!--https://localhost/share/page-->
-
-    <!--<bean id="authenticationDao" class="org.alfresco.repo.security.authentication.RepositoryAuthenticationDao">-->
-        <!--<property name="nodeService" ref="nodeService"/>-->
-        <!--<property name="authorityService" ref="authorityService"/>-->
-        <!--<property name="tenantService" ref="tenantService"/>-->
-        <!--<property name="namespaceService" ref="namespaceService"/>-->
-        <!--<property name="compositePasswordEncoder" ref="compositePasswordEncoder"/>-->
-        <!--<property name="policyComponent" ref="policyComponent"/>-->
-        <!--<property name="authenticationCache" ref="authenticationCache"/>-->
-        <!--<property name="singletonCache" ref="immutableSingletonCache"/>-->
-        <!--<property name="transactionService" ref="transactionService"/>-->
-    <!--</bean>-->
 
     <bean id="userRegistry" class="com.flexsolution.authentication.oauth2.authentication.Oauth2UserRegistry"/>
 </beans>

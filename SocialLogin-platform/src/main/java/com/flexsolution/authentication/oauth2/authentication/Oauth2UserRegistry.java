@@ -9,7 +9,7 @@ import org.alfresco.service.namespace.QName;
 import java.util.*;
 
 /**
- * Created by max on 12/12/17 .
+ * Registry bean for returning a list of blocked field for user profile
  */
 public class Oauth2UserRegistry implements UserRegistry, ActivateableBean {
 
@@ -21,7 +21,7 @@ public class Oauth2UserRegistry implements UserRegistry, ActivateableBean {
         Q_NAMES.add(ContentModel.PROP_EMAIL);
         Q_NAMES.add(ContentModel.PROP_LOCATION);
         Q_NAMES.add(ContentModel.PROP_JOBTITLE);
-        Q_NAMES.add(ContentModel.PROP_PERSONDESC);//todo text area doesn't block and avatar too
+//        Q_NAMES.add(ContentModel.PROP_PERSONDESC);//todo this field is text area and doesn't block by Share UI and avatar too
     }
 
     @Override

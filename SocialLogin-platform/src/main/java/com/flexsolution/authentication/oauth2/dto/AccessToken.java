@@ -8,7 +8,7 @@ import lombok.Setter;
 @Getter
 public class AccessToken {
     /***
-     * The access token for the user.  This value must be kept secure, as per your agreement to the
+     * The access token for the user.  This value must be kept secure
      */
     private String access_token;
 
