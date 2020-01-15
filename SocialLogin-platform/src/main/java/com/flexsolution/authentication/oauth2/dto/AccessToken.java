@@ -1,11 +1,6 @@
 package com.flexsolution.authentication.oauth2.dto;
 
-import lombok.Getter;
-import lombok.Setter;
 
-
-@Setter
-@Getter
 public class AccessToken {
     /***
      * The access token for the user.  This value must be kept secure
@@ -17,4 +12,20 @@ public class AccessToken {
      * Currently, all access tokens are issued with a 60 day lifespan.
      */
     private Integer expires_in;
+
+    public String getAccess_token() {
+        return access_token;
+    }
+
+    public void setAccess_token(String access_token) {
+        this.access_token = access_token;
+    }
+
+    public Integer getExpires_in() {
+        return expires_in;
+    }
+
+    public void setExpires_in(Integer expires_in) {
+        this.expires_in = expires_in;
+    }
 }

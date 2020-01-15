@@ -7,6 +7,7 @@ import com.flexsolution.authentication.oauth2.dto.UserMetadata;
 import com.flexsolution.authentication.oauth2.model.Oauth2ConfigModel;
 import com.flexsolution.authentication.oauth2.util.ResourceService;
 import com.google.gson.Gson;
+import com.google.gson.JsonElement;
 import org.alfresco.repo.admin.SysAdminParams;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.service.cmr.repository.NodeRef;
@@ -35,17 +36,17 @@ import org.springframework.http.MediaType;
 import org.springframework.social.oauth2.OAuth2Version;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 
 public abstract class AbstractOauth2Configs implements Oauth2Config {
 
     public static final String OAUTH2_CONFIG_NODE_PATH = "Data Dictionary/fs.oauth2.config";
     private static final String SHARE_REDIRECT_URL = "/service/api/social-login";
-    private static final String ARGUMENTS = "?response_type=%s&redirect_uri=%s&state=%s&client_id=%s";
+    private static final String ARGUMENTS = "?response_type=%s&redirect_uri=%s&state=%s&client_id=%s&scope=r_liteprofile r_emailaddress w_member_social";
     private static final String AUTHORIZATION_CODE = "authorization_code";
     private static final String CODE = "code";
     private static final String X_LI_FORMAT = "x-li-format";
@@ -55,6 +56,10 @@ public abstract class AbstractOauth2Configs implements Oauth2Config {
     private Oauth2APIFactoryRegisterInterface registerAPI;
     private ResourceService resourceService;
     private String labelKey;
+
+    abstract String getUserPhotoUrl();
+
+    abstract String getUserEmailUrl();
 
     abstract String getAccessTokenURL();
 
@@ -125,16 +130,17 @@ public abstract class AbstractOauth2Configs implements Oauth2Config {
         }
     }
 
-    @Override
-    public UserMetadata getUserMetadata(AccessToken accessToken) {
+    private Map getMetadataParts(String userDataUrl,AccessToken accessToken) {
 
         try (CloseableHttpClient httpclient = HttpClients.custom().build()) {
-            HttpGet get = new HttpGet(getUserDataUrl());
-            get.setHeader(X_LI_FORMAT, WebScriptResponse.JSON_FORMAT);
-            get.setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
-            get.setHeader(HttpHeaders.AUTHORIZATION, OAuth2Version.BEARER.getAuthorizationHeaderValue(accessToken.getAccess_token()));
+            HttpGet getResponse = new HttpGet(userDataUrl);
 
-            try (CloseableHttpResponse response = httpclient.execute(get)) {
+            getResponse.setHeader(X_LI_FORMAT, WebScriptResponse.JSON_FORMAT);
+            getResponse.setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
+            getResponse.setHeader("X-Restli-Protocol-Version", "2.0.0");
+            getResponse.setHeader(HttpHeaders.AUTHORIZATION, OAuth2Version.BEARER.getAuthorizationHeaderValue(accessToken.getAccess_token()));
+
+            try (CloseableHttpResponse response = httpclient.execute(getResponse)) {
 
                 int statusCode = response.getStatusLine().getStatusCode();
 
@@ -142,13 +148,13 @@ public abstract class AbstractOauth2Configs implements Oauth2Config {
 
                 if (statusCode == Status.STATUS_OK) {
 
-                    Gson gson = new Gson();
+                        Gson gson = new Gson();
 
-                    String responseString = EntityUtils.toString(entity, CharEncoding.UTF_8);
+                        String responseString = EntityUtils.toString(entity, CharEncoding.UTF_8);
 
-                    logger.debug(responseString);
+                        logger.debug(gson.fromJson(responseString,Map.class));
 
-                    return gson.fromJson(responseString, UserMetadata.class);
+                        return gson.fromJson(responseString,Map.class);
 
                 } else {
                     throw new WebScriptException(Status.STATUS_UNAUTHORIZED, entity.toString());
@@ -157,6 +163,39 @@ public abstract class AbstractOauth2Configs implements Oauth2Config {
         } catch (IOException e) {
             throw new WebScriptException(Status.STATUS_UNAUTHORIZED, e.toString());
         }
+
+    }
+
+    @Override
+    public UserMetadata getUserMetadata(AccessToken accessToken) {
+
+        Gson gson = new Gson();
+
+        Map result = getMetadataParts(getUserDataUrl(),accessToken);
+        Map <String,List<Map<String, Map<String,String>>>> fullEmailJson = getMetadataParts(getUserEmailUrl(),accessToken);
+        Map <String,String> emailMap = fullEmailJson.get("elements").get(0).get("handle~");
+        for(Map.Entry<String,String> ent : emailMap.entrySet()){
+            result.put(ent.getKey(),ent.getValue());
+        }
+
+        getMetadataParts(getUserPhotoUrl(),accessToken);
+
+        Map<String,Map<String,Map<String,List<Map<String,List<Map<String,String>>>>>>> pictureUrlScheme = getMetadataParts(getUserPhotoUrl(),accessToken);
+
+        Map<String,String> pictureUrl = pictureUrlScheme.get("profilePicture").get("displayImage~").get("elements").get(0).get("identifiers").get(0);
+
+        for(Map.Entry<String,String> ent : pictureUrl.entrySet()){
+            if(ent.getKey().equals("identifier")) {
+                result.put("pictureUrl", ent.getValue());
+            }
+        }
+
+        JsonElement metadataJson = gson.toJsonTree(result);
+
+        logger.debug(metadataJson);
+
+        return gson.fromJson(metadataJson.toString(), UserMetadata.class);
+
     }
 
     @Override

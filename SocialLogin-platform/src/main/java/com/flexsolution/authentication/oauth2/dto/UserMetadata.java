@@ -1,22 +1,19 @@
 package com.flexsolution.authentication.oauth2.dto;
 
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
 
-@Setter
-@Getter
+import java.util.Map;
+
 public class UserMetadata {
 
     private String id;
     /**
      * The member's first name.
      */
-    private String firstName;
+    private String localizedFirstName;
     /**
      * The member's last name.
      */
-    private String lastName;
+    private String localizedLastName;
     /**
      * The LinkedIn member's primary email address.
      * Secondary email addresses associated with the member are not available via the API.
@@ -45,27 +42,119 @@ public class UserMetadata {
     /**
      * An object representing the user's physical location.
      */
-    private Location location = new Location();
+    private Location lastName = new Location();
 
-    @Override
-    public String toString() {
-        return "UserMetadata{" +
-                "id='" + id + '\'' +
-                ", firstName='" + firstName + '\'' +
-                ", lastName='" + lastName + '\'' +
-                '}';
+    public String getId() {
+        return id;
     }
 
-    @Setter
-    @Getter
-    @ToString
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String getLocalizedFirstName() {
+        return localizedFirstName;
+    }
+
+    public void setLocalizedFirstName(String localizedFirstName) {
+        this.localizedFirstName = localizedFirstName;
+    }
+
+    public String getLocalizedLastName() {
+        return localizedLastName;
+    }
+
+    public void setLocalizedLastName(String localizedLastName) {
+        this.localizedLastName = localizedLastName;
+    }
+
+    public String getEmailAddress() {
+        return emailAddress;
+    }
+
+    public void setEmailAddress(String emailAddress) {
+        this.emailAddress = emailAddress;
+    }
+
+    public String getPictureUrl() {
+        return pictureUrl;
+    }
+
+    public void setPictureUrl(String pictureUrl) {
+        this.pictureUrl = pictureUrl;
+    }
+
+    public String getIndustry() {
+        return industry;
+    }
+
+    public void setIndustry(String industry) {
+        this.industry = industry;
+    }
+
+    public String getHeadline() {
+        return headline;
+    }
+
+    public void setHeadline(String headline) {
+        this.headline = headline;
+    }
+
+    public String getPublicProfileUrl() {
+        return publicProfileUrl;
+    }
+
+    public void setPublicProfileUrl(String publicProfileUrl) {
+        this.publicProfileUrl = publicProfileUrl;
+    }
+
+    public String getSummary() {
+        return summary;
+    }
+
+    public void setSummary(String summary) {
+        this.summary = summary;
+    }
+
+
+    public Location getLastName() {
+        return lastName;
+    }
+
+    public void setLastName(Location lastName) {
+        this.lastName = lastName;
+    }
+
     public class Location {
-        /**
-         * A generic name representing the location of the member.
-         * This is a pseudo-curated list generated from user input, and as such,
-         * there is no API call or static reference page that will list all possible for this field.
-         * e.g. "San Francisco Bay Area"
-         */
+
+        private Map<String,String> localized;
+
         private String name;
+
+        public Map<String, String> getLocalized() {
+            return localized;
+        }
+
+        public void setLocalized(Map<String, String> localized) {
+            this.localized = localized;
+        }
+
+        public String getName() {
+            for(Map.Entry<String,String> ent : getLocalized().entrySet()){
+                name=ent.getKey();
+            }
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        @Override
+        public String toString() {
+            return "Location{" +
+                    "name='" + name + '\'' +
+                    '}';
+        }
     }
 }
