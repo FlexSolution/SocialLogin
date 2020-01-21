@@ -5,6 +5,9 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
+@Setter
+@Getter
+@AllArgsConstructor
 @ToString
 public class SocialButton {
     /**
@@ -16,24 +19,5 @@ public class SocialButton {
      */
     private String labelKey;
 
-    public SocialButton(String id, String labelKey) {
-        this.id = id;
-        this.labelKey = labelKey;
-    }
 
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public String getLabelKey() {
-        return labelKey;
-    }
-
-    public void setLabelKey(String labelKey) {
-        this.labelKey = labelKey;
-    }
 }

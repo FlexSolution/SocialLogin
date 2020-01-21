@@ -1,6 +1,13 @@
 package com.flexsolution.authentication.oauth2.dto;
 
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 
+
+@Setter
+@Getter
+@ToString
 public class AccessToken {
     /***
      * The access token for the user.  This value must be kept secure
@@ -13,19 +20,5 @@ public class AccessToken {
      */
     private Integer expires_in;
 
-    public String getAccess_token() {
-        return access_token;
-    }
 
-    public void setAccess_token(String access_token) {
-        this.access_token = access_token;
-    }
-
-    public Integer getExpires_in() {
-        return expires_in;
-    }
-
-    public void setExpires_in(Integer expires_in) {
-        this.expires_in = expires_in;
-    }
 }

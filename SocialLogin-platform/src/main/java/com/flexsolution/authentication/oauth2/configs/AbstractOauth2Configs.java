@@ -151,7 +151,7 @@ public abstract class AbstractOauth2Configs implements Oauth2Config {
 
                         String responseString = EntityUtils.toString(entity, CharEncoding.UTF_8);
 
-                        logger.debug(gson.fromJson(responseString,Map.class));
+                        logger.debug(responseString);
 
                         return gson.fromJson(responseString,Map.class);
 
@@ -183,7 +183,7 @@ public abstract class AbstractOauth2Configs implements Oauth2Config {
         userMetadata.setLocalizedFirstName(userData.get("localizedFirstName").toString());
         userMetadata.setLocalizedLastName(userData.get("localizedLastName").toString());
         Map<String,Map<String,Map<String,String>>> location = getMetadataParts(getUserDataUrl(),accessToken);
-        userMetadata.setLocation(location.get("lastName").get("preferredLocale").toString());
+        userMetadata.setLocation(location.get("lastName").get("preferredLocale").toString().replaceAll("\\{","").replaceAll("}",""));
     }
 
     private void setUserEmail (AccessToken accessToken, UserMetadata userMetadata){
