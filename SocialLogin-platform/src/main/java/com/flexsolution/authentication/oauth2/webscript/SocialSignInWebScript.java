@@ -153,7 +153,7 @@ public class SocialSignInWebScript extends DeclarativeWebScript {
         nodeService.setProperty(personOrNull, ContentModel.PROP_FIRSTNAME, userMetadata.getLocalizedFirstName());
         nodeService.setProperty(personOrNull, ContentModel.PROP_LASTNAME, userMetadata.getLocalizedLastName());
         nodeService.setProperty(personOrNull, ContentModel.PROP_EMAIL, userMetadata.getEmailAddress());
-        nodeService.setProperty(personOrNull, ContentModel.PROP_LOCATION, userMetadata.getLastName().getName());
+        nodeService.setProperty(personOrNull, ContentModel.PROP_LOCATION, userMetadata.getLocation());
         Optional<String> industry = Optional.ofNullable(userMetadata.getIndustry());
         Optional<String> headline = Optional.ofNullable(userMetadata.getHeadline());
         StringBuilder jobTitle = new StringBuilder();

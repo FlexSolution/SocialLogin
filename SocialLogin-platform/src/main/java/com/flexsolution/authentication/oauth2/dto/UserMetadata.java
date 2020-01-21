@@ -42,7 +42,7 @@ public class UserMetadata {
     /**
      * An object representing the user's physical location.
      */
-    private Location lastName = new Location();
+    private String location;
 
     public String getId() {
         return id;
@@ -116,45 +116,68 @@ public class UserMetadata {
         this.summary = summary;
     }
 
-
-    public Location getLastName() {
-        return lastName;
+    public String getLocation () {
+        return location.replaceAll("\\{","").replaceAll("}","");
     }
 
-    public void setLastName(Location lastName) {
-        this.lastName = lastName;
+    public void setLocation (String location) {
+        this.location = location;
     }
 
-    public class Location {
-
-        private Map<String,String> localized;
-
-        private String name;
-
-        public Map<String, String> getLocalized() {
-            return localized;
-        }
-
-        public void setLocalized(Map<String, String> localized) {
-            this.localized = localized;
-        }
-
-        public String getName() {
-            for(Map.Entry<String,String> ent : getLocalized().entrySet()){
-                name=ent.getKey();
-            }
-            return name;
-        }
-
-        public void setName(String name) {
-            this.name = name;
-        }
-
-        @Override
-        public String toString() {
-            return "Location{" +
-                    "name='" + name + '\'' +
-                    '}';
-        }
+    @Override
+    public String toString () {
+        return "UserMetadata{" +
+                "id='" + id + '\'' +
+                ", localizedFirstName='" + localizedFirstName + '\'' +
+                ", localizedLastName='" + localizedLastName + '\'' +
+                ", emailAddress='" + emailAddress + '\'' +
+                ", pictureUrl='" + pictureUrl + '\'' +
+                ", industry='" + industry + '\'' +
+                ", headline='" + headline + '\'' +
+                ", publicProfileUrl='" + publicProfileUrl + '\'' +
+                ", summary='" + summary + '\'' +
+                ", location='" + location + '\'' +
+                '}';
     }
+
+    //    public Location getLastName() {
+//        return lastName;
+//    }
+//
+//    public void setLastName(Location lastName) {
+//        this.lastName = lastName;
+//    }
+
+//    public class Location {
+//
+//        private Map<String,String> localized;
+//
+//        private String name;
+//
+//        public Map<String, String> getLocalized() {
+//            return localized;
+//        }
+//
+//        public void setLocalized(Map<String, String> localized) {
+//            this.localized = localized;
+//        }
+//
+//        public String getName() {
+//            for(Map.Entry<String,String> ent : getLocalized().entrySet()){
+//                name=ent.getKey();
+//            }
+//            return name;
+//        }
+//
+//        public void setName(String name) {
+//            this.name = name;
+//        }
+//
+//        @Override
+//        public String toString() {
+//            return "Location{" +
+//                    "name='" + name + '\'' +
+//                    '}';
+//        }
+//    }
 }

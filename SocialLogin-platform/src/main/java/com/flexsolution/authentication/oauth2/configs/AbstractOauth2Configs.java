@@ -36,7 +36,6 @@ import org.springframework.http.MediaType;
 import org.springframework.social.oauth2.OAuth2Version;
 
 import java.io.IOException;
-import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.*;
@@ -163,39 +162,38 @@ public abstract class AbstractOauth2Configs implements Oauth2Config {
         } catch (IOException e) {
             throw new WebScriptException(Status.STATUS_UNAUTHORIZED, e.toString());
         }
-
     }
 
     @Override
     public UserMetadata getUserMetadata(AccessToken accessToken) {
 
-        Gson gson = new Gson();
+        UserMetadata userMetadata = new UserMetadata();
 
-        Map result = getMetadataParts(getUserDataUrl(),accessToken);
-        Map <String,List<Map<String, Map<String,String>>>> fullEmailJson = getMetadataParts(getUserEmailUrl(),accessToken);
-        Map <String,String> emailMap = fullEmailJson.get("elements").get(0).get("handle~");
-        for(Map.Entry<String,String> ent : emailMap.entrySet()){
-            result.put(ent.getKey(),ent.getValue());
-        }
+        setUnderlyingUserData(accessToken,userMetadata);
+        setUserEmail(accessToken,userMetadata);
+        setUserPhotoUrl(accessToken,userMetadata);
 
-        getMetadataParts(getUserPhotoUrl(),accessToken);
+        logger.debug(userMetadata);
+        return userMetadata;
+    }
 
+    private void setUnderlyingUserData(AccessToken accessToken,UserMetadata userMetadata){
+        Map userData = getMetadataParts(getUserDataUrl(),accessToken);
+        userMetadata.setId(userData.get("id").toString());
+        userMetadata.setLocalizedFirstName(userData.get("localizedFirstName").toString());
+        userMetadata.setLocalizedLastName(userData.get("localizedLastName").toString());
+        Map<String,Map<String,Map<String,String>>> location = getMetadataParts(getUserDataUrl(),accessToken);
+        userMetadata.setLocation(location.get("lastName").get("preferredLocale").toString());
+    }
+
+    private void setUserEmail (AccessToken accessToken, UserMetadata userMetadata){
+        Map <String,List<Map<String, Map<String,String>>>> emailFullJson = getMetadataParts(getUserEmailUrl(),accessToken);
+        userMetadata.setEmailAddress(emailFullJson.get("elements").get(0).get("handle~").get("emailAddress"));
+    }
+
+    private void setUserPhotoUrl(AccessToken accessToken, UserMetadata userMetadata){
         Map<String,Map<String,Map<String,List<Map<String,List<Map<String,String>>>>>>> pictureUrlScheme = getMetadataParts(getUserPhotoUrl(),accessToken);
-
-        Map<String,String> pictureUrl = pictureUrlScheme.get("profilePicture").get("displayImage~").get("elements").get(0).get("identifiers").get(0);
-
-        for(Map.Entry<String,String> ent : pictureUrl.entrySet()){
-            if(ent.getKey().equals("identifier")) {
-                result.put("pictureUrl", ent.getValue());
-            }
-        }
-
-        JsonElement metadataJson = gson.toJsonTree(result);
-
-        logger.debug(metadataJson);
-
-        return gson.fromJson(metadataJson.toString(), UserMetadata.class);
-
+        userMetadata.setPictureUrl(pictureUrlScheme.get("profilePicture").get("displayImage~").get("elements").get(0).get("identifiers").get(0).get("identifier"));
     }
 
     @Override
