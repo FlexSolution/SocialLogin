@@ -190,20 +190,19 @@ public abstract class AbstractOauth2Configs implements Oauth2Config {
 
     private void setUserEmail (AccessToken accessToken, UserMetadata userMetadata){
         Map emailFullJson = getMetadataParts(getUserEmailUrl(),accessToken);
-        List listElements = (ArrayList)emailFullJson.get("elements");
+        List listElements = (List)emailFullJson.get("elements");
         Map getElement = (Map) listElements.get(0);
         Map getHandleObject = (Map) getElement.get("handle~");
         userMetadata.setEmailAddress(getHandleObject.get("emailAddress").toString());
     }
 
     private void setUserPhotoUrl(AccessToken accessToken, UserMetadata userMetadata){
-//        Map<String,Map<String,Map<String,List<Map<String,List<Map<String,String>>>>>>> pictureUrlScheme = getMetadataParts(getUserPhotoUrl(),accessToken);
         Map pictureUrlScheme = getMetadataParts(getUserPhotoUrl(),accessToken);
         Map getProfilePicture = (Map) pictureUrlScheme.get("profilePicture");
         Map getDisplayImage = (Map) getProfilePicture.get("displayImage~");
-        List listElements = (ArrayList)getDisplayImage.get("elements");
+        List listElements = (List) getDisplayImage.get("elements");
         Map getElement = (Map) listElements.get(0);
-        List listIdentifiers = (ArrayList)getElement.get("identifiers");
+        List listIdentifiers = (List)getElement.get("identifiers");
         Map getIdentifier = (Map) listIdentifiers.get(0);
         userMetadata.setPictureUrl(getIdentifier.get("identifier").toString());
     }
