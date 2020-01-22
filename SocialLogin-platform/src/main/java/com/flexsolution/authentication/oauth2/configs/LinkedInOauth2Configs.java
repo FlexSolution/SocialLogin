@@ -8,8 +8,21 @@ public class LinkedInOauth2Configs extends AbstractOauth2Configs {
     private static final String LINKED_IN = "linkedIn";
     private static final String LINKED_IN_AVATAR_JPEG = "LinkedIn_avatar.jpeg";
     private static final String ACCESS_URL = "https://www.linkedin.com/oauth/v2/accessToken";
-    private static final String AUTHORIZATION_URL = "https://www.linkedin.com/uas/oauth2/authorization";
-    private static final String USER_DATA_URL = "https://api.linkedin.com/v1/people/~:(first-name,last-name,id,picture-url,email-address,location,headline,industry,current-share,summary,specialties,positions,public-profile-url)?format=json";
+    private static final String AUTHORIZATION_URL = "https://www.linkedin.com/oauth/v2/authorization";
+    private static final String USER_DATA_URL = "https://api.linkedin.com/v2/me";
+    private static final String USER_PHOTO_URL = "https://api.linkedin.com/v2/me?projection=(id,profilePicture(displayImage~:playableStreams))";
+    private static final String USER_EMAIL_URL = "https://api.linkedin.com/v2/emailAddress?q=members&projection=(elements*(handle~))";
+
+
+    @Override
+    String getUserPhotoUrl() {
+        return USER_PHOTO_URL;
+    }
+
+    @Override
+    String getUserEmailUrl() {
+        return USER_EMAIL_URL;
+    }
 
     @Override
     String getAccessTokenURL() {

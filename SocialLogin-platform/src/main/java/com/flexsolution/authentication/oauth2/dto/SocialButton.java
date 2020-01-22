@@ -7,8 +7,8 @@ import lombok.ToString;
 
 @Setter
 @Getter
-@ToString
 @AllArgsConstructor
+@ToString
 public class SocialButton {
     /**
      * api short name
@@ -18,4 +18,6 @@ public class SocialButton {
      * localized key for display name of Sign In button
      */
     private String labelKey;
+
+
 }
