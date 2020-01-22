@@ -182,18 +182,30 @@ public abstract class AbstractOauth2Configs implements Oauth2Config {
         userMetadata.setId(userData.get("id").toString());
         userMetadata.setLocalizedFirstName(userData.get("localizedFirstName").toString());
         userMetadata.setLocalizedLastName(userData.get("localizedLastName").toString());
-        Map<String,Map<String,Map<String,String>>> location = getMetadataParts(getUserDataUrl(),accessToken);
-        userMetadata.setLocation(location.get("lastName").get("preferredLocale").toString().replaceAll("\\{","").replaceAll("}",""));
+
+        Map getLastName = (Map) userData.get("lastName");
+        Map getPrefferedLocale = (Map) getLastName.get("preferredLocale");
+        userMetadata.setLocation(getPrefferedLocale.toString().replaceAll("\\{","").replaceAll("}",""));
     }
 
     private void setUserEmail (AccessToken accessToken, UserMetadata userMetadata){
-        Map <String,List<Map<String, Map<String,String>>>> emailFullJson = getMetadataParts(getUserEmailUrl(),accessToken);
-        userMetadata.setEmailAddress(emailFullJson.get("elements").get(0).get("handle~").get("emailAddress"));
+        Map emailFullJson = getMetadataParts(getUserEmailUrl(),accessToken);
+        List listElements = (ArrayList)emailFullJson.get("elements");
+        Map getElement = (Map) listElements.get(0);
+        Map getHandleObject = (Map) getElement.get("handle~");
+        userMetadata.setEmailAddress(getHandleObject.get("emailAddress").toString());
     }
 
     private void setUserPhotoUrl(AccessToken accessToken, UserMetadata userMetadata){
-        Map<String,Map<String,Map<String,List<Map<String,List<Map<String,String>>>>>>> pictureUrlScheme = getMetadataParts(getUserPhotoUrl(),accessToken);
-        userMetadata.setPictureUrl(pictureUrlScheme.get("profilePicture").get("displayImage~").get("elements").get(0).get("identifiers").get(0).get("identifier"));
+//        Map<String,Map<String,Map<String,List<Map<String,List<Map<String,String>>>>>>> pictureUrlScheme = getMetadataParts(getUserPhotoUrl(),accessToken);
+        Map pictureUrlScheme = getMetadataParts(getUserPhotoUrl(),accessToken);
+        Map getProfilePicture = (Map) pictureUrlScheme.get("profilePicture");
+        Map getDisplayImage = (Map) getProfilePicture.get("displayImage~");
+        List listElements = (ArrayList)getDisplayImage.get("elements");
+        Map getElement = (Map) listElements.get(0);
+        List listIdentifiers = (ArrayList)getElement.get("identifiers");
+        Map getIdentifier = (Map) listIdentifiers.get(0);
+        userMetadata.setPictureUrl(getIdentifier.get("identifier").toString());
     }
 
     @Override
