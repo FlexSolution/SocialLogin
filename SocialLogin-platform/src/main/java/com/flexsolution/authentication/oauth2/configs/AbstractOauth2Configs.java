@@ -7,7 +7,6 @@ import com.flexsolution.authentication.oauth2.dto.UserMetadata;
 import com.flexsolution.authentication.oauth2.model.Oauth2ConfigModel;
 import com.flexsolution.authentication.oauth2.util.ResourceService;
 import com.google.gson.Gson;
-import com.google.gson.JsonElement;
 import org.alfresco.repo.admin.SysAdminParams;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.service.cmr.repository.NodeRef;
@@ -132,14 +131,14 @@ public abstract class AbstractOauth2Configs implements Oauth2Config {
     private Map getMetadataParts(String userDataUrl,AccessToken accessToken) {
 
         try (CloseableHttpClient httpclient = HttpClients.custom().build()) {
-            HttpGet getResponse = new HttpGet(userDataUrl);
+            HttpGet metadataRequest = new HttpGet(userDataUrl);
 
-            getResponse.setHeader(X_LI_FORMAT, WebScriptResponse.JSON_FORMAT);
-            getResponse.setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
-            getResponse.setHeader("X-Restli-Protocol-Version", "2.0.0");
-            getResponse.setHeader(HttpHeaders.AUTHORIZATION, OAuth2Version.BEARER.getAuthorizationHeaderValue(accessToken.getAccess_token()));
+            metadataRequest.setHeader(X_LI_FORMAT, WebScriptResponse.JSON_FORMAT);
+            metadataRequest.setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
+            metadataRequest.setHeader("X-Restli-Protocol-Version", "2.0.0");
+            metadataRequest.setHeader(HttpHeaders.AUTHORIZATION, OAuth2Version.BEARER.getAuthorizationHeaderValue(accessToken.getAccess_token()));
 
-            try (CloseableHttpResponse response = httpclient.execute(getResponse)) {
+            try (CloseableHttpResponse response = httpclient.execute(metadataRequest)) {
 
                 int statusCode = response.getStatusLine().getStatusCode();
 
@@ -182,10 +181,6 @@ public abstract class AbstractOauth2Configs implements Oauth2Config {
         userMetadata.setId(userData.get("id").toString());
         userMetadata.setLocalizedFirstName(userData.get("localizedFirstName").toString());
         userMetadata.setLocalizedLastName(userData.get("localizedLastName").toString());
-
-        Map getLastName = (Map) userData.get("lastName");
-        Map getPrefferedLocale = (Map) getLastName.get("preferredLocale");
-        userMetadata.setLocation(getPrefferedLocale.toString().replaceAll("\\{","").replaceAll("}",""));
     }
 
     private void setUserEmail (AccessToken accessToken, UserMetadata userMetadata){
