@@ -30,22 +30,27 @@ public class UserMetadata {
     private String pictureUrl;
     /**
      * The industry the member belongs to.
+     * Deprecated
      */
     private String industry;
     /**
      * The member's headline.
+     * Deprecated
      */
     private String headline;
     /**
      * The URL to the member's public profile on LinkedIn.
+     * Deprecated
      */
     private String publicProfileUrl;
     /**
      * A long-form text area describing the member's professional profile.
+     * Deprecated
      */
     private String summary;
     /**
      * An object representing the user's physical location.
+     * Deprecated
      */
     private String location;
 
