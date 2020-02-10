@@ -3,12 +3,10 @@ package com.flexsolution.authentication.oauth2.configs;
 import com.flexsolution.authentication.oauth2.constant.Oauth2Parameters;
 import com.flexsolution.authentication.oauth2.dto.AccessToken;
 import com.flexsolution.authentication.oauth2.dto.SocialButton;
-import com.flexsolution.authentication.oauth2.dto.UserMetadata;
 import com.flexsolution.authentication.oauth2.model.Oauth2ConfigModel;
 import com.flexsolution.authentication.oauth2.util.ResourceService;
 import com.google.gson.Gson;
 import org.alfresco.repo.admin.SysAdminParams;
-import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.namespace.QName;
@@ -44,20 +42,21 @@ public abstract class AbstractOauth2Configs implements Oauth2Config {
 
     public static final String OAUTH2_CONFIG_NODE_PATH = "Data Dictionary/fs.oauth2.config";
     private static final String SHARE_REDIRECT_URL = "/service/api/social-login";
-    private static final String ARGUMENTS = "?response_type=%s&redirect_uri=%s&state=%s&client_id=%s&scope=r_liteprofile r_emailaddress w_member_social";
     private static final String AUTHORIZATION_CODE = "authorization_code";
     private static final String CODE = "code";
-    private static final String X_LI_FORMAT = "x-li-format";
-    private final Log logger = LogFactory.getLog(this.getClass());
-    private NodeService nodeService;
+    protected static final String X_LI_FORMAT = "x-li-format";
+    protected final Log logger = LogFactory.getLog(this.getClass());
+    protected NodeService nodeService;
     private SysAdminParams sysAdminParams;
     private Oauth2APIFactoryRegisterInterface registerAPI;
-    private ResourceService resourceService;
+    protected ResourceService resourceService;
     private String labelKey;
 
-    abstract String getUserPhotoUrl();
+    abstract String getSecretKey();
 
-    abstract String getUserEmailUrl();
+    abstract String getClientId();
+
+    abstract String getUrlArguments();
 
     abstract String getAccessTokenURL();
 
@@ -71,7 +70,6 @@ public abstract class AbstractOauth2Configs implements Oauth2Config {
 
     abstract String getUserDataUrl();
 
-
     private String getRedirectURL() {
         return UrlUtil.getShareUrl(sysAdminParams) + SHARE_REDIRECT_URL;
     }
@@ -81,9 +79,10 @@ public abstract class AbstractOauth2Configs implements Oauth2Config {
 
         ParameterCheck.mandatoryString(Oauth2Parameters.STATE, state);
 
-        String fullUrl = getAuthorizationURL() + ARGUMENTS;
+        String fullUrl = getAuthorizationURL() + getUrlArguments();
 
         return String.format(fullUrl, CODE, encode(getRedirectURL()), encode(state), encode(getClientId()));
+
     }
 
 
@@ -128,7 +127,7 @@ public abstract class AbstractOauth2Configs implements Oauth2Config {
         }
     }
 
-    private Map getMetadataParts(String userDataUrl,AccessToken accessToken) {
+    protected Map getMetadataParts(String userDataUrl,AccessToken accessToken) {
 
         try (CloseableHttpClient httpclient = HttpClients.custom().build()) {
             HttpGet metadataRequest = new HttpGet(userDataUrl);
@@ -163,50 +162,8 @@ public abstract class AbstractOauth2Configs implements Oauth2Config {
         }
     }
 
-    @Override
-    public UserMetadata getUserMetadata(AccessToken accessToken) {
-
-        UserMetadata userMetadata = new UserMetadata();
-
-        setUnderlyingUserData(accessToken,userMetadata);
-        setUserEmail(accessToken,userMetadata);
-        setUserPhotoUrl(accessToken,userMetadata);
-
-        logger.debug(userMetadata);
-        return userMetadata;
-    }
-
-    private void setUnderlyingUserData(AccessToken accessToken,UserMetadata userMetadata){
-        Map userData = getMetadataParts(getUserDataUrl(),accessToken);
-        userMetadata.setId(userData.get("id").toString());
-        userMetadata.setLocalizedFirstName(userData.get("localizedFirstName").toString());
-        userMetadata.setLocalizedLastName(userData.get("localizedLastName").toString());
-    }
-
-    private void setUserEmail (AccessToken accessToken, UserMetadata userMetadata){
-        Map emailFullJson = getMetadataParts(getUserEmailUrl(),accessToken);
-        List listElements = (List)emailFullJson.get("elements");
-        Map getElement = (Map) listElements.get(0);
-        Map getHandleObject = (Map) getElement.get("handle~");
-        userMetadata.setEmailAddress(getHandleObject.get("emailAddress").toString());
-    }
-
-    private void setUserPhotoUrl(AccessToken accessToken, UserMetadata userMetadata){
-        Map pictureUrlScheme = getMetadataParts(getUserPhotoUrl(),accessToken);
-        Map getProfilePicture = (Map) pictureUrlScheme.get("profilePicture");
-        Map getDisplayImage = (Map) getProfilePicture.get("displayImage~");
-        List listElements = (List) getDisplayImage.get("elements");
-        Map getElement = (Map) listElements.get(0);
-        List listIdentifiers = (List)getElement.get("identifiers");
-        Map getIdentifier = (Map) listIdentifiers.get(0);
-        userMetadata.setPictureUrl(getIdentifier.get("identifier").toString());
-    }
-
-    @Override
-    public boolean isEnabled() {
-        return AuthenticationUtil.runAs(() ->
-                        Boolean.TRUE.equals(nodeService.getProperty(getOauth2ConfigFile(), getQNameForEnableField())),
-                AuthenticationUtil.getAdminUserName());
+    protected NodeRef getOauth2ConfigFile() {
+        return resourceService.getNode(OAUTH2_CONFIG_NODE_PATH, Oauth2ConfigModel.TYPE_OAUTH2_CONFIG);
     }
 
     @Override
@@ -214,25 +171,9 @@ public abstract class AbstractOauth2Configs implements Oauth2Config {
         return new SocialButton(getApiName(), labelKey);
     }
 
-    private NodeRef getOauth2ConfigFile() {
-        return resourceService.getNode(OAUTH2_CONFIG_NODE_PATH, Oauth2ConfigModel.TYPE_OAUTH2_CONFIG);
-    }
-
 
     private String encode(String value) throws UnsupportedEncodingException {
         return URLEncoder.encode(value, CharEncoding.UTF_8);
-    }
-
-    private String getClientId() {
-        return AuthenticationUtil.runAs(() ->
-                        (String) nodeService.getProperty(getOauth2ConfigFile(), getClientIdQName()),
-                AuthenticationUtil.getAdminUserName());
-    }
-
-    private String getSecretKey() {
-        return AuthenticationUtil.runAs(() ->
-                        (String) nodeService.getProperty(getOauth2ConfigFile(), getSecretKeyQName()),
-                AuthenticationUtil.getAdminUserName());
     }
 
 

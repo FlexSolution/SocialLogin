@@ -5,6 +5,20 @@
     padding-right: 5px;
 }
 
+/* ==== Google ===== */
+.social-login-button > #google > .first-child > button {
+    background-color: #00b248;
+    border-color: #00b248;
+}
+
+.social-login-button > #google > .first-child {
+    border-color: #00b248;
+}
+
+.social-login-button > #google > .first-child > button:before {
+    content: "\f0d4"; /* font awesome linkedIn icon */
+}
+
 /* ==== LinkedIn ===== */
 .social-login-button > #linkedIn > .first-child > button {
     background-color: #0077b5;

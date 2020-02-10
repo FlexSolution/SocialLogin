@@ -18,6 +18,11 @@
         <property name="labelKey" value="button.linkedIn"/>
     </bean>
 
+    <bean id="googleOauth2Config" class="com.flexsolution.authentication.oauth2.configs.GoogleInOauth2Configs"
+          parent="abstractOauth2Configs">
+        <property name="labelKey" value="button.google"/>
+    </bean>
+
     <bean id="oauth2APIFactoryBean" class="com.flexsolution.authentication.oauth2.configs.Oauth2APIFactoryImpl"/>
 
 </beans>

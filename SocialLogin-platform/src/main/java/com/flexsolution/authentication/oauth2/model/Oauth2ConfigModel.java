@@ -14,8 +14,12 @@ public abstract class Oauth2ConfigModel {
     // Aspects
     public static final QName ASPECT_OAUTH2_LINKED_IN_CONFIG = QName.createQName(NAMESPACE, "Oauth2LinkedInConfig");
 
-    // Properties
+    // LinkedIn Properties
     public static final QName PROP_LINKED_IN_CLIENT_ID = QName.createQName(NAMESPACE, "LinkedInClientId");
     public static final QName PROP_LINKED_IN_SECRET_KEY = QName.createQName(NAMESPACE, "LinkedInSecretKey");
     public static final QName PROP_LINKED_IN_OAUTH2_SIGN_IN_ENABLED = QName.createQName(NAMESPACE, "LinkedInOauth2SignInEnabled");
+    // Google Properties
+    public static final QName PROP_GOOGLE_CLIENT_ID = QName.createQName(NAMESPACE, "GoogleClientId");
+    public static final QName PROP_GOOGLE_SECRET_KEY = QName.createQName(NAMESPACE, "GoogleSecretKey");
+    public static final QName PROP_GOOGLE_OAUTH2_SIGN_IN_ENABLED = QName.createQName(NAMESPACE, "GoogleOauth2SignInEnabled");
 }

@@ -4,7 +4,7 @@
     <@link href="SocialLogin-share/components/libs/font-awesome-4.7.0/css/font-awesome.min.css" group="login"/>
 
 <script type="text/javascript">
-    new FlexSolution.component.SocialLoginButtons("${args.htmlid}-social-buttons");
+    new FlexSolution.component.SocialLoginButtons("${args.htmlid}");
 </script>
 </@markup>
 
@@ -12,7 +12,3 @@
 <#-- JavaScript Dependencies -->
     <@script src="SocialLogin-share/components/js/socialLogin/LoginButtons.js" group="login"/>
 </@markup>
-
-<@markup id="reset-password" target="buttons" action="after" scope="page">
-<div class="form-field social-login-button" id="${args.htmlid}-social-buttons"></div>
-</@>

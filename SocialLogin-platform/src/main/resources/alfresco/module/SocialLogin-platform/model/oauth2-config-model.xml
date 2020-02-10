@@ -17,6 +17,7 @@
             <parent>cm:content</parent>
             <mandatory-aspects>
                 <aspect>fs:doNotIndexContentControl</aspect>
+                <aspect>fs:Oauth2GoogleConfig</aspect>
                 <aspect>fs:Oauth2LinkedInConfig</aspect>
                 <aspect>sys:hidden</aspect>
             </mandatory-aspects>
@@ -37,21 +38,47 @@
             </overrides>
         </aspect>
 
+        <aspect name="fs:Oauth2GoogleConfig">
+            <properties>
+
+            <!--Google Properties-->
+
+                <property name="fs:GoogleOauth2SignInEnabled">
+                    <title>Is Google Oauth2 Sign In Enabled ?</title>
+                    <type>d:boolean</type>
+                    <default>false</default>
+                </property>
+                <property name="fs:GoogleClientId">
+                    <title>Google Client ID</title>
+                    <type>d:text</type>
+                </property>
+                <property name="fs:GoogleSecretKey">
+                    <title>Google Secret KEY</title>
+                    <type>d:text</type>
+                </property>
+
+            </properties>
+        </aspect>
+
         <aspect name="fs:Oauth2LinkedInConfig">
             <properties>
+
+                <!--LinkedIn Properties-->
+
                 <property name="fs:LinkedInOauth2SignInEnabled">
                     <title>Is LinkedIn Oauth2 Sign In Enabled ?</title>
                     <type>d:boolean</type>
                     <default>false</default>
                 </property>
                 <property name="fs:LinkedInClientId">
-                    <title>Client ID</title>
+                    <title>LinkedIn Client ID</title>
                     <type>d:text</type>
                 </property>
                 <property name="fs:LinkedInSecretKey">
-                    <title>Secret KEY</title>
+                    <title>LinkedIn Secret KEY</title>
                     <type>d:text</type>
                 </property>
+
             </properties>
         </aspect>
     </aspects>
