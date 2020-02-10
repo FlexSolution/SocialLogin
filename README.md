@@ -41,13 +41,13 @@ share.port=443
 share.protocol=https
 ```
 
-* Login to your admin LinkedIn account on [https://www.linkedin.com/developer/apps](https://www.linkedin.com/developer/apps). Click on the button `Create Application`.
+###Linked In authorization
+
+* Login to your admin LinkedIn account on [https://www.linkedin.com/developer/apps](https://www.linkedin.com/developer/apps). Click on the button `My Apps` -> `Create app`.
 
 * Fill out all required fields and save it.
 
-* Open `Authentication` tab where you can see your `Client Id` and `Secret Key`. **Do not show this keys to anybody**. This codes will need you for further setup.
-
-* Check the checkboxes from `Default Application Permissions` set. The `r_basicprofile`	and `r_emailaddress` have to be checked (true), and `rw_company_admin` and `w_share` - unchecked (false).
+* Open `Auth` tab where you can see your `Client Id` and `Secret Key`. **Do not show this keys to anybody**. This codes will need you for further setup.
 
 * Add `OAuth 2.0 Authorized Redirect URLs`: enter a URL of your installed Alfresco with format `https://<IP>:<Port>/share/service/api/social-login` where `IP` - is the IP address of your server or DNS name, `Port` - http port (keep empty if you are using default http port). 
 Examples: `https://192.168.0.119:8443/share/service/api/social-login`, `https://your.company.nds/share/service/api/social-login`
@@ -58,5 +58,30 @@ Examples: `https://192.168.0.119:8443/share/service/api/social-login`, `https://
 
 * Fill `Client ID` and `Secret KEY` from your LinkedIn application that you have already created. Set checkbox `Is LinkedIn Oauth2 Sign In Enabled ?` for enabling `Sign In with LinkedIn` button on the login page. Click `Submit`.
 
-* Done. You can open login page an sing into Alfresco Share as a LinkedIn user.
+* Done. You can open login page an sign into Alfresco Share as a LinkedIn user.
 ![Sample Video](https://ecm.flex-solution.com/share/proxy/alfresco/slingshot/node/content/workspace/SpacesStore/af4cffb5-5c4e-4b18-a810-b01237a7adb4/LinkedIn%20integration%20v4.mp4)
+
+###Google authorization
+
+* Login to your admin Google account on [https://console.developers.google.com/](https://console.developers.google.com/). Click on the button `Create Application`.
+
+* Fill out all required fields and save it.
+
+* Choose `Credentials` clause . In new window open `CREATE CREDENTIALS`.
+
+* Click on `API key` and `OAuth client ID`. 
+
+* After these steps you'll see generated key and id on your `credentials` page.
+
+* Click on modify Client Id parameter and add  `OAuth 2.0 Authorized Redirect URLs`: enter a URL of your installed Alfresco with format `https://<IP>:<Port>/share/service/api/social-login`
+where `IP` - is the IP address of your server or DNS name, `Port` - http port (keep empty if you are using default http port). 
+Examples: `https://your.company.nds/share/service/api/social-login`
+
+**Do not forget click `SAVE` button . Do not close the page until you can see success saving message**.
+
+* login as the admin user to Alfresco Share. Open:`Admin Tools`/`Tools`/`Oauth2 Configuration` -  Sample URL for locally installed Alfresco: [http://localhost:8080/share/page/console/admin-console/oauth2-config-form](http://localhost:8080/share/page/console/admin-console/oauth2-config-form) 
+
+* Fill `API key` and `OAuth client ID` from your Google application that you have already created. Set checkbox `Is Google Oauth2 Sign In Enabled ?` for enabling `Sign In with Google` button on the login page. Click `Submit`.
+
+* Done. You can open login page and sign into Alfresco Share as a Google user.
+
