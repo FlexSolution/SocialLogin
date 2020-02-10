@@ -7,8 +7,9 @@
 
 /* ==== Google ===== */
 .social-login-button > #google > .first-child > button {
-    background-color: #00b248;
-    border-color: #00b248;
+    background-color: white;
+    border-color: #16b3ba;
+    color: grey;
 }
 
 .social-login-button > #google > .first-child {
@@ -16,7 +17,15 @@
 }
 
 .social-login-button > #google > .first-child > button:before {
-    content: "\f0d4"; /* font awesome linkedIn icon */
+    /*content: "\f1a0"; !* font awesome google icon *!*/
+    content: ""; /* font awesome google icon */
+    background-image: url("google.png");
+    background-repeat: no-repeat;
+    padding-left: 25px;
+
+    width: 25px;
+    height: 25px;
+
 }
 
 /* ==== LinkedIn ===== */

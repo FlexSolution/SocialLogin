@@ -70,14 +70,6 @@ public class SocialSignInWebScript extends DeclarativeWebScript {
     private ContentService contentService;
     private AuthorityService authorityService;
 
-    public AuthenticationComponent getAuthenticationComponent () {
-        return authenticationComponent;
-    }
-
-    public void setAuthenticationComponent (AuthenticationComponent authenticationComponent) {
-        this.authenticationComponent = authenticationComponent;
-    }
-
     protected Map<String, Object> executeImpl(WebScriptRequest req, Status status, Cache cache) {
 
         String state = req.getParameter(Oauth2Parameters.STATE);
@@ -274,4 +266,6 @@ public class SocialSignInWebScript extends DeclarativeWebScript {
     public void setAuthorityService(AuthorityService authorityService) {
         this.authorityService = authorityService;
     }
+
+    public void setAuthenticationComponent (AuthenticationComponent authenticationComponent) { this.authenticationComponent = authenticationComponent; }
 }
