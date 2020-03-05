@@ -16,7 +16,7 @@
     <@markup id="html">
         <@uniqueIdDiv>
             <#import "/org/alfresco/components/form/form.lib.ftl" as formLib />
-         <div class="oauth2-config-form-container ">
+         <div class="oauth2-config-form-container">
          <#if error?exists>
              <div class="error">${error}</div>
          <#elseif form?exists>

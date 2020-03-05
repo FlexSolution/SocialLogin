@@ -8,6 +8,11 @@
                     <show id="fs:LinkedInOauth2SignInEnabled"/>
                     <hide id="cm:isIndexed"/>
                     <hide id="cm:isContentIndexed"/>
+
+                    <show id="fs:GoogleClientId"/>
+                    <show id="fs:GoogleSecretKey"/>
+                    <show id="fs:GoogleOauth2SignInEnabled"/>
+
                 </field-visibility>
                 <appearance>
                     <set id="linkedInSet" appearance="title" label-id="LinkedIn"
@@ -16,8 +21,18 @@
                     <field id="fs:LinkedInClientId" set="linkedInSet"/>
                     <field id="fs:LinkedInSecretKey" set="linkedInSet"/>
                     <field id="fs:LinkedInOauth2SignInEnabled" set="linkedInSet-checkbox"/>
+
+                    <set id="googleSet" appearance="title" label-id="Google"
+                         template="/org/alfresco/components/form/2-column-set.ftl"/>
+                    <set id="googleSet-checkbox" appearance=""/>
+                    <field id="fs:GoogleClientId" set="googleSet"/>
+                    <field id="fs:GoogleSecretKey" set="googleSet"/>
+                    <field id="fs:GoogleOauth2SignInEnabled" set="googleSet-checkbox"/>
                 </appearance>
             </form>
         </forms>
     </config>
+
+
+
 </alfresco-config>

@@ -56,11 +56,18 @@ var namespace = function (identifier) {
 
                                 for (var i = 0; i < list.length; i++) {
                                     var socialButton = list[i];
+
+                                    var buttonContainer = document.createElement("div");
+                                    buttonContainer.id = this.id + "-container-" + socialButton.id;
+                                    buttonContainer.className = "form-field social-login-button";
+
+                                    document.getElementsByTagName("form")[0].appendChild(buttonContainer);
+
                                     this.widgets[socialButton.id] = new YAHOO.widget.Button({
                                         type: "push",
                                         label: Alfresco.util.message(socialButton.labelKey),
                                         id: socialButton.id,
-                                        container: this.id,
+                                        container: buttonContainer.id,
                                         onclick: {
                                             fn: this.showDialog,
                                             obj: socialButton,
@@ -98,7 +105,7 @@ var namespace = function (identifier) {
 
                                 var oauthpopup = function (options) {
                                     options.windowName = options.windowName || 'ConnectWithOAuth'; // should not include space for IE
-                                    options.windowOptions = options.windowOptions || 'location=0,status=0,width=400,height=400';
+                                    options.windowOptions = options.windowOptions || 'location=0,status=0,width=400,height=550';
                                     options.callback = options.callback || function () {
                                         window.location.reload();
                                     };

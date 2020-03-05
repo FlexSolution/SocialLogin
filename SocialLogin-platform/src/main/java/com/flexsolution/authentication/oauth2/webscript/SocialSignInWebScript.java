@@ -28,6 +28,7 @@ import com.flexsolution.authentication.oauth2.dto.UserMetadata;
 import com.flexsolution.authentication.oauth2.util.ImageComparator;
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.content.MimetypeMap;
+import org.alfresco.repo.security.authentication.AuthenticationComponent;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.repo.transaction.AlfrescoTransactionSupport;
 import org.alfresco.service.cmr.repository.*;
@@ -60,6 +61,8 @@ public class SocialSignInWebScript extends DeclarativeWebScript {
     private static final String EMPTY_STR = "";
     private static final String FLEX_OAUTH2 = "flex_oauth2";
 
+
+    private AuthenticationComponent authenticationComponent;
     private AuthenticationService authenticationService;
     private PersonService personService;
     private NodeService nodeService;
@@ -107,7 +110,7 @@ public class SocialSignInWebScript extends DeclarativeWebScript {
 
         AlfrescoTransactionSupport.bindResource(Oauth2Transaction.AUTHENTICATION_USER_NAME, userName);
 
-        authenticationService.authenticate(userName, "1".toCharArray());//any password
+        authenticationComponent.authenticate(userName, "1".toCharArray());
 
         NodeRef personOrNull = personService.getPersonOrNull(userName);
 
@@ -263,4 +266,6 @@ public class SocialSignInWebScript extends DeclarativeWebScript {
     public void setAuthorityService(AuthorityService authorityService) {
         this.authorityService = authorityService;
     }
+
+    public void setAuthenticationComponent (AuthenticationComponent authenticationComponent) { this.authenticationComponent = authenticationComponent; }
 }

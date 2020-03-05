@@ -5,6 +5,29 @@
     padding-right: 5px;
 }
 
+/* ==== Google ===== */
+.social-login-button > #google > .first-child > button {
+    background-color: white;
+    border-color: #16b3ba;
+    color: grey;
+}
+
+.social-login-button > #google > .first-child {
+    border-color: #00b248;
+}
+
+.social-login-button > #google > .first-child > button:before {
+    /*content: "\f1a0"; !* font awesome google icon *!*/
+    content: ""; /* font awesome google icon */
+    background-image: url("google.png");
+    background-repeat: no-repeat;
+    padding-left: 25px;
+
+    width: 25px;
+    height: 25px;
+
+}
+
 /* ==== LinkedIn ===== */
 .social-login-button > #linkedIn > .first-child > button {
     background-color: #0077b5;
